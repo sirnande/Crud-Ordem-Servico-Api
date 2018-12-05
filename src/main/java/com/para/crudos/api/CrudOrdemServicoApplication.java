@@ -1,4 +1,4 @@
-package com.apredizagem.CrudOrdemServico.api;
+package com.para.crudos.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
