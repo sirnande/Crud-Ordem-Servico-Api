@@ -46,4 +46,10 @@ public class EnderecoServiceImplementation implements EnderecoService {
     public Optional<Endereco> buscarPorId(Long id) {
         return this.enderecoRepository.findById(id);
     }
+
+    @Override
+    public void remover(Long id) {
+        log.info("Removendo um endereco por id: {}", id);
+        this.enderecoRepository.deleteById(id);
+    }
 }

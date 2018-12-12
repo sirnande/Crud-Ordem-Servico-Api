@@ -25,6 +25,12 @@ public class ClienteServiceImplementation implements ClienteService {
     }
 
     @Override
+    public Optional<Cliente> buscarPorId(Long id) {
+        log.info("Buscar um cliente pelo id: {}", id);
+        return this.clienteRepository.findById(id);
+    }
+
+    @Override
     public Optional<Cliente> buscarPorCpf(String cpf) {
         log.info("Buscando por cliente pelo cpf: }", cpf );
         return Optional.ofNullable(this.clienteRepository.findByCpf(cpf));
@@ -48,4 +54,9 @@ public class ClienteServiceImplementation implements ClienteService {
         return Optional.ofNullable(this.clienteRepository.findByEmail(email));
     }
 
+    @Override
+    public void remover(Long id) {
+        log.info("Removendo um cliente da base de dados com  id: []", id);
+        this.clienteRepository.deleteById(id);
+    }
 }

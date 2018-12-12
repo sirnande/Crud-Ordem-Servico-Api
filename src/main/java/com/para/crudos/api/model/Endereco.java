@@ -1,16 +1,9 @@
 package com.para.crudos.api.model;
 
 import java.io.Serializable;
+import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "endereco")
@@ -22,10 +15,10 @@ public class Endereco  implements Serializable{
 	private String bairro;
 	private String cidade;
 	private String estado;
-	private OrdemServico os;
+	private List<OrdemServico> os;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_endereco")
 	public Long getId() {
 		return id;
 	}
@@ -81,11 +74,11 @@ public class Endereco  implements Serializable{
 	
 	
 	
-	@OneToOne(mappedBy = "endereco", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	public OrdemServico getOs() {
+	@OneToMany(mappedBy = "endereco", fetch = FetchType.LAZY)
+	public List<OrdemServico> getOs() {
 		return os;
 	}
-	public void setOs(OrdemServico os) {
+	public void setOs(List<OrdemServico> os) {
 		this.os = os;
 	}
 

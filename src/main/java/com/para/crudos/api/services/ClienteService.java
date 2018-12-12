@@ -6,7 +6,6 @@ import java.util.Optional;
 
 public interface ClienteService {
 
-
     /**
      *
      * Persistir um cliente na base de dado
@@ -16,6 +15,16 @@ public interface ClienteService {
      */
 
     Cliente persistir(Cliente cliente);
+
+
+    /**
+     * Buscar um cliente dado um id
+     *
+     * @param id
+     * @return Optional<Cliente>
+     */
+    Optional<Cliente> buscarPorId(Long id);
+
 
 
     /**
@@ -55,5 +64,11 @@ public interface ClienteService {
      */
     Optional<Cliente> buscarPorEmail(String email);
 
+
+    /**Reover um cliente da base de dados
+     *
+     * @param id
+     */
+    void remover(Long id);
 
 }

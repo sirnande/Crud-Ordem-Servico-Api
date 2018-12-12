@@ -23,7 +23,7 @@ public class Tecnico implements Serializable{
 	
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_tecnico")
 	public Long getId() {
 		return id;
 	}
@@ -39,17 +39,21 @@ public class Tecnico implements Serializable{
 		this.nome = nome;
 	}
 
-	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "tecnico", fetch = FetchType.LAZY)
 	public List<OrdemServico> getOs() {
 		return os;
 	}
 	public void setOs(List<OrdemServico> os) {
 		this.os = os;
 	}
+
+
 	@Override
 	public String toString() {
-		return "Tecnico [id=" + id + ", nome=" + nome + "]";
+		return "Tecnico{" +
+				"id=" + id +
+				", nome='" + nome + '\'' +
+				", os=" + os +
+				'}';
 	}
-	
-
 }

@@ -1,24 +1,11 @@
 package com.para.crudos.api.model;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
 import com.para.crudos.api.enums.Status;
 
-import net.bytebuddy.matcher.FailSafeMatcher;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "ordemservico")
@@ -32,10 +19,10 @@ public class OrdemServico implements Serializable{
 	private Cliente cliente;
 	private Tecnico tecnico;
 	private Endereco endereco;
-	
-	
+
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_ordemservico")
 	public Long getId() {
 		return id;
 	}
@@ -78,6 +65,9 @@ public class OrdemServico implements Serializable{
 	public void setStatus(Status status) {
 		this.status = status;
 	}
+
+
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "cliente_id", nullable = false) 
 	public Cliente getCliente() {
@@ -97,8 +87,10 @@ public class OrdemServico implements Serializable{
 	public void setTecnico(Tecnico tecnico) {
 		this.tecnico = tecnico;
 	}
-	
-	@OneToOne(fetch = FetchType.EAGER)
+
+
+
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "endereco_id", nullable = false)
 	public Endereco getEndereco() {
 		return endereco;
@@ -106,15 +98,23 @@ public class OrdemServico implements Serializable{
 	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
 	}
-	
-	
-	
-	@Override
-	public String toString() {
-		return "OrdemServico [id=" + id + ", especificacao=" + especificacao + ", dataAberta=" + dataAberta
-				+ ", dataFinalizada=" + dataFinalizada + ", status=" + status + ", cliente=" + cliente + ", tecnico="
-				+ tecnico + ", endereco=" + endereco + "]";
+
+	@PrePersist
+	public void prePersist() {
+		dataAberta = new Date();
 	}
 
-
+	@Override
+	public String toString() {
+		return "OrdemServico{" +
+				"id=" + id +
+				", especificacao='" + especificacao + '\'' +
+				", dataAberta=" + dataAberta +
+				", dataFinalizada=" + dataFinalizada +
+				", status=" + status +
+				", cliente=" + cliente +
+				", tecnico=" + tecnico +
+				", endereco=" + endereco +
+				'}';
+	}
 }

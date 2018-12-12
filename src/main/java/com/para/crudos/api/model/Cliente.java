@@ -3,18 +3,10 @@ package com.para.crudos.api.model;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "cliente")
+//@Table(name = "cliente")
 public class Cliente implements Serializable{
 	
 	private Long id;
@@ -25,7 +17,8 @@ public class Cliente implements Serializable{
 	private List<OrdemServico> os;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_cliente")
+	@Column(name = "id")
 	public Long getId() {
 		return id;
 	}
@@ -68,20 +61,23 @@ public class Cliente implements Serializable{
 	}
 	
 	
-	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
 	public List<OrdemServico> getOs() {
 		return os;
 	}
 	public void setOs(List<OrdemServico> os) {
 		this.os = os;
 	}
-	
-	
+
+
 	@Override
 	public String toString() {
-		return "Cliente [id=" + id + ", nome=" + nome + ", telefone=" + telefone + ", email=" + email + ", cpf=" + cpf
-				+ ", os=" + os + "]";
+		return "Cliente{" +
+				"id=" + id +
+				", nome='" + nome + '\'' +
+				", telefone='" + telefone + '\'' +
+				", email='" + email + '\'' +
+				", cpf='" + cpf + '\'' +
+				'}';
 	}
-	
-
 }

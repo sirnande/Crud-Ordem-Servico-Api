@@ -54,4 +54,12 @@ public interface EnderecoService {
     Optional<Endereco> buscarPorId(Long id);
 
 
+    /**
+     * Deletando um endereco por id
+     *
+     * @param id
+     */
+    void remover(Long id);
+
+
 }

@@ -17,6 +17,15 @@ public interface TecnicoService {
 
 
     /**
+     * Buscar e retorna um tecnipor por id
+     *
+     * @param id
+     * @return Optional<Tecnico>
+     */
+    Optional<Tecnico> buscarPorId(Long id);
+
+
+    /**
      * Buscar e retorna uma lista de tecnico dado um nome
      *
      * @param nome
@@ -25,6 +34,12 @@ public interface TecnicoService {
     Optional<Tecnico> buscarPorNome(String nome);
 
 
+    /**
+     * Deleteandoum tecnico por Id
+     *
+     * @param id
+     */
+    void remover(Long id);
 
 
 }

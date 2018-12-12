@@ -26,6 +26,12 @@ public class TecnicoServiceImplementation implements TecnicoService {
         return this.tecnicoRepository.save(tecnico);
     }
 
+
+    @Override
+    public Optional<Tecnico> buscarPorId(Long id) {
+        return this.tecnicoRepository.findById(id);
+    }
+
     @Override
     public Optional<Tecnico> buscarPorNome(String nome) {
         log.info("Buscar tecnico por nome: {}", nome);
@@ -33,4 +39,9 @@ public class TecnicoServiceImplementation implements TecnicoService {
     }
 
 
+    @Override
+    public void remover(Long id) {
+        log.info("Deletando um novo tecnico por id: {}", id);
+        this.tecnicoRepository.deleteById(id);
+    }
 }
