@@ -1,8 +1,13 @@
 package com.para.crudos.api.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.para.crudos.api.auditoria.Auditoria;
+import com.para.crudos.api.dtos.ClienteDto;
 import com.para.crudos.api.model.Cliente;
 import com.para.crudos.api.services.ClienteService;
 import com.para.crudos.api.setup.UrlApi;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -35,27 +40,30 @@ public class ClienteControllerTest {
     @MockBean
     private ClienteService clienteService;
 
-    private static final String BUSCAR_CLIENTE_URL = UrlApi.URL+"/clientes/cpf/";
-    private static final Long ID = Long.valueOf(1);
+
+    private static final String URL_BASE = UrlApi.URL+"/clientes";
+    private static final Long ID =  1L;
     private static final String CPF = "01834275210";
     private static final String NOME = "Sirnande Lima";
     private static final String TELEFONE = "123456";
     private static final String EMAIL = "teste@teste.com";
 
     @Test
+    @DisplayName("tentar buscar cliente com cpf invalido e gerar erro")
     public void testBuscarClenteCpfInvalido() throws Exception{
         BDDMockito.given(this.clienteService.buscarPorCpf(Mockito.anyString())).willReturn(Optional.empty());
 
-        mvc.perform(MockMvcRequestBuilders.get(BUSCAR_CLIENTE_URL + CPF).accept(MediaType.APPLICATION_JSON))
+        mvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/cpf/" + CPF).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").value("Cliente não encontrado para o CPF "+ CPF));
+                .andExpect(jsonPath("$.erros").value("Cliente não encontrado para o CPF: "+ CPF));
     }
 
     @Test
+    @DisplayName("Tentar buscar um cliente por cpf")
     public void testBuscarClienteCpfValido() throws Exception{
         BDDMockito.given(this.clienteService.buscarPorCpf(Mockito.anyString()))
                 .willReturn(Optional.of(this.obterDadosCliente()));
-        mvc.perform(MockMvcRequestBuilders.get(BUSCAR_CLIENTE_URL + CPF)
+        mvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/cpf/" + CPF)
                     .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(ID))
@@ -63,7 +71,42 @@ public class ClienteControllerTest {
                 .andExpect(jsonPath("$.data.cpf", equalTo(CPF)))
                 .andExpect(jsonPath("$.data.telefone", equalTo(TELEFONE)))
                 .andExpect(jsonPath("$.data.email", equalTo(EMAIL)))
-                .andExpect(jsonPath("$.errors").isEmpty());
+                .andExpect(jsonPath("$.erros").isEmpty());
+    }
+
+    @Test
+    @DisplayName("tentar cadastrar um cliente")
+    public void testCadastrarCliente() throws Exception{
+
+        Cliente cliente = obterDadosCliente();
+        BDDMockito.given(this.clienteService.buscarPorId(Mockito.anyLong())).willReturn(Optional.of(new Cliente()));
+        BDDMockito.given(this.clienteService.persistir(Mockito.any(Cliente.class))).willReturn(cliente);
+
+        mvc.perform(MockMvcRequestBuilders.post(URL_BASE + "/cadastro-cliente")
+                        .content(this.obterJsonRequisicaoPost())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.id").value(ID))
+                    .andExpect(jsonPath("$.data.cpf").value(CPF))
+                    .andExpect(jsonPath("$.data.nome").value(NOME))
+                    .andExpect(jsonPath("$.data.email").value(EMAIL))
+                    .andExpect(jsonPath("$.data.telefone").value(TELEFONE))
+                    .andExpect(jsonPath("$.erros").isEmpty());
+    }
+
+    @Test
+    public void testeCadastrarClienteCpfExixtente() throws Exception {
+        Cliente cliente = this.obterDadosCliente();
+        BDDMockito.given(this.clienteService.persistir(Mockito.any(Cliente.class))).willReturn(cliente);
+
+        mvc.perform(MockMvcRequestBuilders.post(URL_BASE + "/cadastro-cliente")
+                    .content(this.obterJsonRequisicaoPost())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.eros").value("Error cpf já existente"))
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 
     private Cliente obterDadosCliente() {
@@ -76,6 +119,18 @@ public class ClienteControllerTest {
         cliente.setEmail(EMAIL);
 
         return cliente;
+    }
+
+    private String obterJsonRequisicaoPost() throws JsonProcessingException {
+        ClienteDto clienteDto = new ClienteDto();
+
+        clienteDto.setId(ID);
+        clienteDto.setCpf(CPF);
+        clienteDto.setEmail(EMAIL);
+        clienteDto.setNome(NOME);
+        clienteDto.setTelefone(TELEFONE);
+        ObjectMapper mapper =  new ObjectMapper();
+        return mapper.writeValueAsString(clienteDto);
     }
 
 

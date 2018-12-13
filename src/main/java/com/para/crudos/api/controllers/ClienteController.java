@@ -42,7 +42,7 @@ public class ClienteController {
     public ResponseEntity<Response<ClienteDto>> cadastrar(@Valid @RequestBody ClienteDto clienteDto,
                                                           BindingResult result) throws NoSuchAlgorithmException{
         log.info("Cadastrando cliente: {}", clienteDto.toString());
-        Response<ClienteDto> response = new Response<>(); //Vai ser utilizado para retorna os dados
+        Response<ClienteDto> response = new Response<>();
 
         validarDadosExistentes(clienteDto, result);
         Cliente cliente = this.converterDtoParaCliente(clienteDto, result);
@@ -77,6 +77,7 @@ public class ClienteController {
 
         if(!cliente.isPresent()){
             log.info("Cliente não encontrado para o CPF: {}", cpf);
+            response.getErros().add("Cliente não encontrado para o CPF: " +cpf);
             return ResponseEntity.badRequest().body(response);
         }
 
