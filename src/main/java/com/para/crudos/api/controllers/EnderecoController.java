@@ -70,6 +70,7 @@ public class EnderecoController {
 
         if(!endereco.isPresent()){
             log.info("CEP não encontrado: {}", cep);
+            response.getErros().add("CEP não encontrado: "+cep);
             return ResponseEntity.badRequest().body(response);
         }
 
@@ -94,12 +95,14 @@ public class EnderecoController {
         log.info("Atualizando Enderco : {}", enderecoDto.toString());
 
         Response<EnderecoDto> response =  new Response<>();
-       // validarDadosExistentes(enderecoDto, result);
+        validarDadosExistentes(enderecoDto, result);
 
         Optional<Endereco> endereco = this.enderecoService.buscarPorId(id);
 
         if(!endereco.isPresent()){
             result.addError(new ObjectError("endereco", "Error endereco não encontrado para o id: "+id));
+            response.getErros().add("Error endereco não encontrado para o id: "+ id);
+            return ResponseEntity.badRequest().body(response);
         }
 
         auditoria.post(this.converterCadastroEnderecoDto(endereco.get()), enderecoDto, "Endereco");
@@ -143,6 +146,9 @@ public class EnderecoController {
         this.enderecoService.remover(id);
         return ResponseEntity.ok(response);
     }
+
+
+
 
 
     /**

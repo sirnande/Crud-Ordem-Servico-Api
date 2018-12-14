@@ -138,7 +138,7 @@ public class ClienteControllerTest {
         Cliente cliente = this.obterDadosCliente();
 
         when(this.clienteService.buscarPorId(cliente.getId())).thenReturn(Optional.of(cliente));
-       // doNothing().when(this.clienteService).persistir(cliente);
+
         mvc.perform(
                 MockMvcRequestBuilders.put(URL_BASE + "/id/{id}",3)
                 .contentType(MediaType.APPLICATION_JSON)

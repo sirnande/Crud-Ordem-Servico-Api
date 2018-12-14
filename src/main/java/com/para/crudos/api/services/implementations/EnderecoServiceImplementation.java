@@ -31,6 +31,7 @@ public class EnderecoServiceImplementation implements EnderecoService {
         return Optional.ofNullable(this.enderecoRepository.findByCep(cep));
     }
 
+
     @Override
     public Optional<List<Endereco>> buscarPorRua(String rua) {
         log.info("Buscar endereco por rua: {}", rua);
