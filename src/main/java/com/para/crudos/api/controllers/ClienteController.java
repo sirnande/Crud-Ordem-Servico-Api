@@ -105,6 +105,8 @@ public class ClienteController {
         Optional<Cliente> cliente =  this.clienteService.buscarPorId(id);
         if(!cliente.isPresent()){
             result.addError(new ObjectError("cliente", "Cliente não encontrado"));
+            response.getErros().add("Erro cliente não encontrado para o id "+ id);
+            return ResponseEntity.badRequest().body(response);
         }
 
 
