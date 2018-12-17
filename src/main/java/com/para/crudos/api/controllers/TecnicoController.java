@@ -30,13 +30,6 @@ public class TecnicoController {
     private Auditoria<TecnicoDto> auditoria = new Auditoria<>();
 
 
-    /**
-     * Método responsável por cadastrar um novo tecnico
-     *
-     * @param tecnicoDto
-     * @param result
-     * @return ResponseEntity<Response<TecnicoDto>>
-     */
     @PostMapping("/cadastro-tecnico")
     public ResponseEntity<Response<TecnicoDto>> cadastrar(@Valid @RequestBody TecnicoDto tecnicoDto, BindingResult result){
         log.info("Cadastrando um novo Técnico: {}", tecnicoDto.toString());
@@ -61,12 +54,7 @@ public class TecnicoController {
 
 
 
-    /**
-     * Método responsável por buscar um técnico dado im determinado id
-     *
-     * @param id
-     * @return ResponseEntity<Response<TecnicoDto>>
-     */
+
     @GetMapping("/id/{id}")
     public ResponseEntity<Response<TecnicoDto>> buscarPorNome(@PathVariable("id") Long id){
         log.info("Retorna um tecnico prlo id: {}", id);
@@ -85,15 +73,6 @@ public class TecnicoController {
     }
 
 
-    /**
-     * Método responsável por atualizar um tecnico
-     *
-     * @param id
-     * @param tecnicoDto
-     * @param result
-     * @return ResponseEntity<Response<TecnicoDto>>
-     * @throws ParseException
-     */
     @PutMapping("/{id}")
     public ResponseEntity<Response<TecnicoDto>> atualizar(@PathVariable("id") Long id,
                                                           @Valid @RequestBody TecnicoDto tecnicoDto, BindingResult  result) throws ParseException {
@@ -124,13 +103,6 @@ public class TecnicoController {
     }
 
 
-
-    /**
-     * Método responsável por deletra um tecnico
-     *
-     * @param id
-     * @return esponseEntity<Response<String>>
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Response<String>> deletar(@PathVariable("id") Long id){
         log.info("Excluindo um cliente pelo id: {}", id);
@@ -157,12 +129,6 @@ public class TecnicoController {
 
 
 
-    /**
-     * Método responsável por converter entidade Tecnico me TecnicoDto
-     *
-     * @param tecnico
-     * @return
-     */
     private TecnicoDto converterCadastroTecnicoDto(Tecnico tecnico) {
 
         TecnicoDto tecnicoDto = new TecnicoDto();
@@ -174,13 +140,7 @@ public class TecnicoController {
     }
 
 
-    /**
-     * Método responsálvel por converter objeto DTO para Tecnico
-     *
-     * @param tecnicoDto
-     * @param result
-     * @return Tecnico
-     */
+
     private Tecnico converterDtoParaTecnico(TecnicoDto tecnicoDto, BindingResult result) {
         Tecnico tecnico = new Tecnico();
 
@@ -190,12 +150,6 @@ public class TecnicoController {
     }
 
 
-    /**
-     * Método responsável por verificar se os dados já existem no banco de dado
-     *
-     * @param tecnicoDto
-     * @param result
-     */
     private void validarDadosExistentes(TecnicoDto tecnicoDto, BindingResult result) {
         this.tecnicoService.buscarPorNome(tecnicoDto.getNome())
                 .ifPresent(emp -> result.addError(new ObjectError("tecnico", "NOME já existente")));

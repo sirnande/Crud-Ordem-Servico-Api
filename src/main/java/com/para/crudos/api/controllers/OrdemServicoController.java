@@ -55,16 +55,7 @@ public class OrdemServicoController {
 
     private Auditoria<OrdemServicoDto> auditoria = new Auditoria<>();
 
-    /**
-     *
-     * Método responsável por retorna uma lista paginada dado um ID de um cliente
-     *
-     * @param clienteId
-     * @param pag
-     * @param ord
-     * @param dir
-     * @return ResponseEntity<Response<Page<OrdemServicoDto>>>
-     */
+
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<Response<Page<OrdemServicoDto>>> listarPorClienteId(@PathVariable("clienteId") long clienteId,
                                                                               @RequestParam(value = "pag", defaultValue = "0") int pag,
@@ -90,12 +81,7 @@ public class OrdemServicoController {
     }
 
 
-    /**
-     * Método responsável por retorna uma Ordem de Servico por ID
-     *
-     * @param id
-     * @return ResponseEntity<Response<OrdemServicoDto>>
-     */
+
     @GetMapping("/{id}")
     public ResponseEntity<Response<OrdemServicoDto>> listarporId(@PathVariable("id") Long id){
         log.info("Buscar orddem de servico por id: {}", id);
@@ -114,14 +100,7 @@ public class OrdemServicoController {
     }
 
 
-    /**
-     * Método responsável por criar uma nova ordem de servico
-     *
-     * @param ordemServicoDto
-     * @param result
-     * @return ResponseEntity<Response<OrdemServicoDto>>
-     * @throws ParseException
-     */
+
     @PostMapping("/cadastro-os")
     public ResponseEntity<Response<OrdemServicoDto>> adicionar(@Valid @RequestBody OrdemServicoDto ordemServicoDto,
                                                                BindingResult result) throws ParseException {
@@ -145,15 +124,6 @@ public class OrdemServicoController {
     }
 
 
-    /**
-     * Método responsável por atualizar uma ordem de servico
-     *
-     * @param id
-     * @param ordemServicoDto
-     * @param result
-     * @return ResponseEntity<Response<OrdemServicoDto>>
-     * @throws ParseException
-     */
     @PutMapping("/{id}")
     public ResponseEntity<Response<OrdemServicoDto>> atualizar(@PathVariable("id") Long id,
                                                                @Valid @RequestBody OrdemServicoDto ordemServicoDto, BindingResult  result) throws ParseException{
@@ -188,12 +158,7 @@ public class OrdemServicoController {
     }
 
 
-    /**
-     * Método responsável por remover uma ordem de serviço por ID
-     *
-     * @param id
-     * @return ResponseEntity<Response<String>>
-     */
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Response<String>> remover(@PathVariable("id") Long id){
         log.info("Removendo ordem de serviço; {}", id);
@@ -213,14 +178,7 @@ public class OrdemServicoController {
 
 
 
-    /**
-     * Método responsável por converter OrdemServicoDto para um model OrdemServico
-     *
-     * @param ordemServicoDto
-     * @param result
-     * @return OrdemServico
-     * @throws ParseException
-     */
+
     private OrdemServico converterDtoParaOrdemServico(OrdemServicoDto ordemServicoDto, BindingResult result) throws ParseException {
 
         OrdemServico ordemServico = new OrdemServico();
@@ -253,12 +211,6 @@ public class OrdemServicoController {
     }
 
 
-    /**
-     * Método responsável por validar o tecnico, verificando se ele existe e válido na base de dado
-     *
-     * @param ordemServicoDto
-     * @param result
-     */
     private void validarTecnico(OrdemServicoDto ordemServicoDto, BindingResult result) {
         if(ordemServicoDto.getTecnico() == null){
             result.addError(new ObjectError("tecnico", "Tecnico não informado."));
@@ -272,12 +224,7 @@ public class OrdemServicoController {
         }
     }
 
-    /**
-     * Método responsável por validar o endereco, verificando se ele existe e válido na base de dado
-     *
-     * @param ordemServicoDto
-     * @param result
-     */
+
     private void validarEndereco(OrdemServicoDto ordemServicoDto, BindingResult result) {
         if(ordemServicoDto.getEndereco() == null){
             result.addError(new ObjectError("endereco", "CEP do endereco não informado"));
@@ -292,12 +239,6 @@ public class OrdemServicoController {
     }
 
 
-    /**
-     * Método responsável por validar o cliente, verificadno se ele existe e válido no sistema
-     *
-     * @param ordemServicoDto
-     * @param result
-     */
     private void validarCliente(OrdemServicoDto ordemServicoDto, BindingResult result) {
         if(ordemServicoDto.getCliente() == null){
             result.addError(new ObjectError("cliente", "Cliente não informado"));
@@ -312,12 +253,7 @@ public class OrdemServicoController {
     }
 
 
-    /**
-     * Método responsável por converter objeto OrdemServico para ser respectivo DTO
-     *
-     * @param ordemServico
-     * @return OrdemServicoDto
-     */
+
     private OrdemServicoDto converterOrdemServicoDto(OrdemServico ordemServico) {
         OrdemServicoDto ordemServicoDto = new OrdemServicoDto();
 

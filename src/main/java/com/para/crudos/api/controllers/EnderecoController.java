@@ -55,12 +55,6 @@ public class EnderecoController {
     }
 
 
-    /**
-     * Método responsável por consultar endereco dado um determinado CEP
-     *
-     * @param cep
-     * @return ResponseEntity<Response<EnderecoDto>>
-     */
     @GetMapping("/cep/{cep}")
     public ResponseEntity<Response<EnderecoDto>> buscarPorCep(@PathVariable("cep") String cep){
         log.info("Buscando endereco pelo cep: {}", cep);
@@ -80,15 +74,7 @@ public class EnderecoController {
     }
 
 
-    /**
-     * Método responsável por atualçizar um endereco
-     *
-     * @param id
-     * @param enderecoDto
-     * @param result
-     * @return ResponseEntity<Response<EnderecoDto>>
-     * @throws ParseException
-     */
+
     @PutMapping("/{id}")
     public ResponseEntity<Response<EnderecoDto>> atualizar(@PathVariable("id") Long id,
                                                         @Valid @RequestBody EnderecoDto enderecoDto, BindingResult  result) throws ParseException{
@@ -123,12 +109,6 @@ public class EnderecoController {
 
 
 
-    /**
-     * Método responsável por excluir um endereco da base de dados
-     *
-     * @param id
-     * @return ResponseEntity<Response<String>>
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Response<String>> deletar(@PathVariable("id") Long id){
         log.info("Removendo um endereco: {}", id);
@@ -150,14 +130,6 @@ public class EnderecoController {
 
 
 
-
-    /**
-     * Método responsável por atualizar dados cliente
-     *
-     * @param endereco
-     * @param enderecoDto
-     * @param result
-     */
     private void atualizarDadosEndereco(Endereco endereco, EnderecoDto enderecoDto, BindingResult result) {
 
         if(!endereco.getCep().equals(enderecoDto.getCep()))
@@ -169,12 +141,7 @@ public class EnderecoController {
     }
 
 
-    /**
-     * Método responsável por popular o DTO de endereco com os dados do endereco
-     *
-     * @param endereco
-     * @return EnderecoDto
-     */
+
     private EnderecoDto converterCadastroEnderecoDto(Endereco endereco) {
         EnderecoDto enderecoDto = new EnderecoDto();
 
@@ -188,13 +155,7 @@ public class EnderecoController {
         return enderecoDto;
     }
 
-    /**
-     * Método responsável por converter Objeto DTO para Endereco
-     *
-     * @param enderecoDto
-     * @param result
-     * @return Endereco
-     */
+
     private Endereco converteDtoParaEndereco(EnderecoDto enderecoDto, BindingResult result) {
         Endereco endereco = new Endereco();
 
@@ -207,12 +168,7 @@ public class EnderecoController {
         return endereco;
     }
 
-    /**
-     * Método responsável por verificar se o endereco ja existe no banco de dado
-     *
-     * @param enderecoDto
-     * @param result
-     */
+
     private void validarDadosExistentes(EnderecoDto enderecoDto, BindingResult result) {
         this.enderecoService.buscarPorCep(enderecoDto.getCep())
                 .ifPresent(emp -> result.addError(new ObjectError("endereco", "CEP já existente.")));

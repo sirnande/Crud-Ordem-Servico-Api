@@ -29,15 +29,7 @@ public class ClienteController {
 
     private Auditoria<ClienteDto> auditoria =  new Auditoria<>();
 
-    /**
-     *
-     * Método responsável por cadastrar um novo cliente na base de dados
-     *
-     * @param clienteDto
-     * @param result
-     * @return ResponseEntity<Response<ClienteDto>>
-     * @throws NoSuchAlgorithmException
-     */
+
     @PostMapping("/cadastro-cliente")
     public ResponseEntity<Response<ClienteDto>> cadastrar(@Valid @RequestBody ClienteDto clienteDto,
                                                           BindingResult result) throws NoSuchAlgorithmException{
@@ -61,14 +53,6 @@ public class ClienteController {
 
 
 
-
-
-    /**
-     * Método responsável por retorna um cliente dado um CPF
-     *
-     * @param cpf
-     * @return ResponseEntity<Response<ClienteDto>>
-     */
     @GetMapping("/cpf/{cpf}")
     public ResponseEntity<Response<ClienteDto>> buscarPorCpf(@PathVariable("cpf") String cpf){
         log.info("Buscando clinete por cpf: {}", cpf);
@@ -86,15 +70,7 @@ public class ClienteController {
     }
 
 
-    /**
-     * Método responsável por atualizar um cliente dado um id de lçocalização
-     *
-     * @param id
-     * @param clienteDto
-     * @param result
-     * @return ResponseEntity<Response<ClienteDto>>
-     * @throws NoSuchAlgorithmException
-     */
+
     @PutMapping("/id/{id}")
     public ResponseEntity<Response<ClienteDto>> atualizar(@PathVariable("id") Long id,
                                                           @Valid @RequestBody ClienteDto clienteDto,  BindingResult result) throws NoSuchAlgorithmException{
@@ -127,12 +103,6 @@ public class ClienteController {
     }
 
 
-    /**
-     * Método responsável por deletar um cliente  dado um id
-     *
-     * @param id
-     * @return ResponseEntity<Response<String>>
-     */
     @DeleteMapping("/id/{id}")
     public ResponseEntity<Response<String>> deletar(@PathVariable("id") Long id){
         log.info("Removendo um cliente pelo id; {}", id);
@@ -155,13 +125,7 @@ public class ClienteController {
     }
 
 
-    /**
-     * Método responsável por Atualizar dados do cliente nos dados encontrados no DTO
-     *
-     * @param cliente
-     * @param clienteDto
-     * @param result
-     */
+
     private void atualizarDadosCliente(Cliente cliente, ClienteDto clienteDto, BindingResult result) {
 
         cliente.setNome(clienteDto.getNome());
@@ -172,12 +136,7 @@ public class ClienteController {
     }
 
 
-    /**
-     * Popular o DTO de cadastro com os dados do cliente
-     *
-     * @param cliente
-     * @return ClienteDto
-     */
+
     private ClienteDto converterCadastroClienteDto(Cliente cliente) {
         ClienteDto clienteDto = new ClienteDto();
 
@@ -191,12 +150,6 @@ public class ClienteController {
     }
 
 
-    /**
-     * Método responsável por verificar se o cliente exite no banco de dados
-     *
-     * @param clienteDto
-     * @param result
-     */
     private void validarDadosExistentes(ClienteDto clienteDto, BindingResult result) {
 
         this.clienteService.buscarPorCpf(clienteDto.getCpf())
@@ -207,13 +160,7 @@ public class ClienteController {
     }
 
 
-    /**
-     * Método converte dados do Objeto DTO para cliente
-     *
-     * @param clienteDto
-     * @param result
-     * @return Cliente
-     */
+
     private Cliente converterDtoParaCliente(ClienteDto clienteDto, BindingResult result){
         Cliente cliente = new Cliente();
 
