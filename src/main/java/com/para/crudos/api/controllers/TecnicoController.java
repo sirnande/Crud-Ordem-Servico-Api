@@ -76,6 +76,7 @@ public class TecnicoController {
 
         if(!tecnico.isPresent()){
             log.error("Tecnico não encotrado: {}", id);
+            response.getErros().add("Tecnico não encontrado para o ID "+ id);
             return ResponseEntity.badRequest().body(response);
         }
 
@@ -103,6 +104,8 @@ public class TecnicoController {
         Optional<Tecnico> tecnico =  this.tecnicoService.buscarPorId(id);
         if(!tecnico.isPresent()){
             result.addError(new ObjectError("Tecnico", "Erro tecnico não encontrado"));
+            response.getErros().add("Erro tecnico não encontrado para o id "+id);
+            return ResponseEntity.badRequest().body(response);
         }
 
         auditoria.post(this.converterCadastroTecnicoDto(tecnico.get()), tecnicoDto, "Tecnico");
@@ -115,8 +118,8 @@ public class TecnicoController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        Tecnico tecnicos = this.tecnicoService.persistir(tecnico.get());
-        response.setData(this.converterCadastroTecnicoDto(tecnicos));
+       this.tecnicoService.persistir(tecnico.get());
+        response.setData(this.converterCadastroTecnicoDto(tecnico.get()));
         return ResponseEntity.ok(response);
     }
 
@@ -144,6 +147,10 @@ public class TecnicoController {
         return ResponseEntity.ok(response);
     }
 
+
+
+
+
     private void atualizarDadosTecnico(Tecnico tecnico, TecnicoDto tecnicoDto, BindingResult result) {
         tecnico.setNome(tecnicoDto.getNome());
     }
@@ -160,6 +167,7 @@ public class TecnicoController {
 
         TecnicoDto tecnicoDto = new TecnicoDto();
 
+        tecnicoDto.setId(tecnico.getId());
         tecnicoDto.setNome(tecnico.getNome());
 
         return tecnicoDto;

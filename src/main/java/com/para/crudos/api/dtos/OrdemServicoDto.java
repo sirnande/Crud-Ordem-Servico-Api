@@ -1,8 +1,9 @@
 package com.para.crudos.api.dtos;
 
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
-public class OrdemServicoDto{
+public class OrdemServicoDto implements Serializable {
 
     private Long id;
 

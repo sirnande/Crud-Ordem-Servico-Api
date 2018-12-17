@@ -74,9 +74,15 @@ public class OrdemServicoController {
         log.info("Buscando lançamento por ID de cliente: {}, página: {}", clienteId, pag);
         Response<Page<OrdemServicoDto>>response = new Response<>();
 
-        PageRequest pageRequest = new PageRequest(pag, this.qtdPorPagina, Sort.Direction.valueOf(dir), ord);
+        PageRequest pageRequest =   PageRequest.of(pag, this.qtdPorPagina, Sort.Direction.valueOf(dir), ord);
         Page<OrdemServico> ordemServicos = this.ordemServicoService.buscarPorClienteId(clienteId, pageRequest);
+        if(ordemServicos == null){
+            response.getErros().add("Erro cliente não encontrado para o id: "+ clienteId);
+            return ResponseEntity.badRequest().body(response);
+        }
+
         Page<OrdemServicoDto> ordemServicoDtos = ordemServicos.map(ordemServico -> this.converterOrdemServicoDto(ordemServico));
+
 
         response.setData(ordemServicoDtos);
         return ResponseEntity.ok(response);
@@ -92,14 +98,14 @@ public class OrdemServicoController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Response<OrdemServicoDto>> listarporId(@PathVariable("id") Long id){
-        log.info("Buscar orddem de servico por id: {]", id);
+        log.info("Buscar orddem de servico por id: {}", id);
 
         Response<OrdemServicoDto> response =  new Response<>();
         Optional<OrdemServico> ordemServico = this.ordemServicoService.buscarPorId(id);
 
         if(!ordemServico.isPresent()){
             log.info("Ordem de servico não encontardo pelo ID: {}", id);
-            response.getErros().add("Ordem de servico não encontardo pelo ID: {}" + id);
+            response.getErros().add("Ordem de servico não encontardo pelo ID: " + id);
             return ResponseEntity.badRequest().body(response);
         }
 
@@ -133,7 +139,7 @@ public class OrdemServicoController {
             return ResponseEntity.badRequest().body(response);
         }
         this.auditoria.post(new OrdemServicoDto(), ordemServicoDto, "OrdemServico");
-        ordemServico = this.ordemServicoService.persistir(ordemServico);
+        this.ordemServicoService.persistir(ordemServico);
         response.setData(this.converterOrdemServicoDto(ordemServico));
         return ResponseEntity.ok(response);
     }
@@ -161,10 +167,14 @@ public class OrdemServicoController {
         Optional<OrdemServico> ordemServico = this.ordemServicoService.buscarPorId(id);
 
         if(!ordemServico.isPresent()){
-            result.addError(new ObjectError("OrdemServico","Error Ordem de Servico não encontrado"));
+            result.addError(new ObjectError("OrdemServico","Error Ordem de Servico não encontrada para o id "+id));
+           // response.getErros().add("Error Ordem de Servico não encontrada para o id "+id);
+            ResponseEntity.badRequest().body(response);
         }
 
-       this.converterDtoParaOrdemServico(ordemServicoDto, result);
+        this.auditoria.post(this.converterOrdemServicoDto(ordemServico.get()), ordemServicoDto, "OrdemServico");
+        ordemServico = Optional.of(this.converterDtoParaOrdemServico(ordemServicoDto, result));
+      // ordemServico.get() = this.converterDtoParaOrdemServico(ordemServicoDto, result);
 
         if(result.hasErrors()){
             log.error("Erro ao validar ordem de servico: {}", result.getAllErrors());
@@ -215,6 +225,7 @@ public class OrdemServicoController {
 
         OrdemServico ordemServico = new OrdemServico();
 
+        ordemServico.setId(ordemServicoDto.getId());
 
         ordemServico.setCliente(new Cliente());
         ordemServico.getCliente().setId(ordemServicoDto.getCliente());
@@ -228,7 +239,8 @@ public class OrdemServicoController {
 
         ordemServico.setEspecificacao(ordemServicoDto.getEspecificacao());
         ordemServico.setDataAberta(this.dateFormat.parse(ordemServicoDto.getDataAberta()));
-        ordemServico.setDataFinalizada(this.dateFormat.parse(ordemServicoDto.getDataFinalizada()));
+        if(ordemServicoDto.getDataFinalizada() != null )
+            ordemServico.setDataFinalizada(this.dateFormat.parse(ordemServicoDto.getDataFinalizada()));
 
         if(EnumUtils.isValidEnum(Status.class, ordemServicoDto.getStatus())){
             ordemServico.setStatus(Status.valueOf(ordemServicoDto.getStatus()));
@@ -313,7 +325,8 @@ public class OrdemServicoController {
         ordemServicoDto.setEspecificacao(ordemServico.getEspecificacao());
         ordemServicoDto.setStatus(ordemServico.getStatus().toString());
         ordemServicoDto.setDataAberta(this.dateFormat.format(ordemServico.getDataAberta()));
-        ordemServicoDto.setDataFinalizada(this.dateFormat.format(ordemServico.getDataFinalizada()));
+        if (ordemServico.getDataFinalizada() != null)
+            ordemServicoDto.setDataFinalizada(this.dateFormat.format(ordemServico.getDataFinalizada()));
         ordemServicoDto.setCliente(ordemServico.getCliente().getId());
         ordemServicoDto.setEndereco(ordemServico.getEndereco().getId());
         ordemServicoDto.setTecnico(ordemServico.getTecnico().getId());

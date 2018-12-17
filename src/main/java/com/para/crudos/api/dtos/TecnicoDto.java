@@ -3,8 +3,9 @@ package com.para.crudos.api.dtos;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
-public class TecnicoDto {
+public class TecnicoDto implements Serializable {
 
     private Long id;
     private String nome;
