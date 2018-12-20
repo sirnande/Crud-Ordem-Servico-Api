@@ -3,7 +3,7 @@ package com.para.crudos.api.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.para.crudos.api.dtos.OrdemServicoDto;
+import com.para.crudos.api.dtos.OrdemServicoDTO;
 import com.para.crudos.api.enums.Status;
 import com.para.crudos.api.model.Cliente;
 import com.para.crudos.api.model.Endereco;
@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class OrdemServicoControllerTest {
+public class OrdemServicoServiceControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -81,7 +81,7 @@ public class OrdemServicoControllerTest {
     public void tetsCadastrarOrdemServico() throws Exception{
         OrdemServico ordemServico = this.obterDadosOrdemServico();
 
-        when(this.clienteService.buscarPorId(Mockito.anyLong())).thenReturn(Optional.of(new Cliente()));
+        when(this.clienteService.buscarPorId(Mockito.anyLong())).thenReturn(new Cliente());
         when(this.enderecoService.buscarPorId(Mockito.anyLong())).thenReturn(Optional.of(new Endereco()));
         when(this.tecnicoService.buscarPorId(Mockito.anyLong())).thenReturn(Optional.of(new Tecnico()));
 
@@ -159,7 +159,7 @@ public class OrdemServicoControllerTest {
     @DisplayName("Atualizar ordem de servico por id")
     public void testAtualizarOrdemServicoPorId() throws Exception{
         OrdemServico ordemServico =  this.obterDadosOrdemServico();
-        when(this.clienteService.buscarPorId(Mockito.anyLong())).thenReturn(Optional.of(new Cliente()));
+        when(this.clienteService.buscarPorId(Mockito.anyLong())).thenReturn(new Cliente());
         when(this.enderecoService.buscarPorId(Mockito.anyLong())).thenReturn(Optional.of(new Endereco()));
         when(this.tecnicoService.buscarPorId(Mockito.anyLong())).thenReturn(Optional.of(new Tecnico()));
 
@@ -178,7 +178,7 @@ public class OrdemServicoControllerTest {
     @DisplayName("Atualizar ordem de servico por id invalido")
     public void testAtualizarOrdemServicoPorIdInvalido() throws Exception{
         OrdemServico ordemServico =  this.obterDadosOrdemServico();
-        when(this.clienteService.buscarPorId(Mockito.anyLong())).thenReturn(Optional.of(new Cliente()));
+        when(this.clienteService.buscarPorId(Mockito.anyLong())).thenReturn(new Cliente());
         when(this.enderecoService.buscarPorId(Mockito.anyLong())).thenReturn(Optional.of(new Endereco()));
         when(this.tecnicoService.buscarPorId(Mockito.anyLong())).thenReturn(Optional.of(new Tecnico()));
 
@@ -223,7 +223,7 @@ public class OrdemServicoControllerTest {
 
 
     private String obterJsonRequisitPost() throws JsonProcessingException{
-        OrdemServicoDto ordemServicoDto = new OrdemServicoDto();
+        OrdemServicoDTO ordemServicoDto = new OrdemServicoDTO();
 
         ordemServicoDto.setEspecificacao(ESPECIFICACAO);
         ordemServicoDto.setStatus(STATUS);
@@ -238,7 +238,7 @@ public class OrdemServicoControllerTest {
     }
 
     private String obterJsonRequisitPut() throws JsonProcessingException{
-        OrdemServicoDto ordemServicoDto = new OrdemServicoDto();
+        OrdemServicoDTO ordemServicoDto = new OrdemServicoDTO();
 
         ordemServicoDto.setEspecificacao(ESPECIFICACAO);
         ordemServicoDto.setStatus("CONCLUIDO");

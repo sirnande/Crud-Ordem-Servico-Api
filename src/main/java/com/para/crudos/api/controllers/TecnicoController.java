@@ -1,7 +1,7 @@
 package com.para.crudos.api.controllers;
 
 import com.para.crudos.api.auditoria.Auditoria;
-import com.para.crudos.api.dtos.TecnicoDto;
+import com.para.crudos.api.dtos.TecnicoDTO;
 import com.para.crudos.api.model.Tecnico;
 import com.para.crudos.api.response.Response;
 import com.para.crudos.api.services.TecnicoService;
@@ -27,14 +27,14 @@ public class TecnicoController {
     @Autowired
     private TecnicoService tecnicoService;
 
-    private Auditoria<TecnicoDto> auditoria = new Auditoria<>();
+    private Auditoria<TecnicoDTO> auditoria = new Auditoria<>();
 
 
     @PostMapping("/cadastro-tecnico")
-    public ResponseEntity<Response<TecnicoDto>> cadastrar(@Valid @RequestBody TecnicoDto tecnicoDto, BindingResult result){
+    public ResponseEntity<Response<TecnicoDTO>> cadastrar(@Valid @RequestBody TecnicoDTO tecnicoDto, BindingResult result){
         log.info("Cadastrando um novo Técnico: {}", tecnicoDto.toString());
 
-        Response<TecnicoDto> response = new Response<>();
+        Response<TecnicoDTO> response = new Response<>();
 
         validarDadosExistentes(tecnicoDto, result);
         Tecnico tecnico = this.converterDtoParaTecnico(tecnicoDto, result);
@@ -45,7 +45,7 @@ public class TecnicoController {
            return ResponseEntity.badRequest().body(response);
         }
 
-        auditoria.post(new TecnicoDto(), this.converterCadastroTecnicoDto(tecnico), "Tecnico");
+        auditoria.post(new TecnicoDTO(), this.converterCadastroTecnicoDto(tecnico), "Tecnico");
         this.tecnicoService.persistir(tecnico);
         response.setData(this.converterCadastroTecnicoDto(tecnico));
         return ResponseEntity.ok(response);
@@ -56,10 +56,10 @@ public class TecnicoController {
 
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<Response<TecnicoDto>> buscarPorNome(@PathVariable("id") Long id){
+    public ResponseEntity<Response<TecnicoDTO>> buscarPorNome(@PathVariable("id") Long id){
         log.info("Retorna um tecnico prlo id: {}", id);
 
-        Response<TecnicoDto> response = new Response<>();
+        Response<TecnicoDTO> response = new Response<>();
         Optional<Tecnico> tecnico = this.tecnicoService.buscarPorId(id);
 
         if(!tecnico.isPresent()){
@@ -74,10 +74,10 @@ public class TecnicoController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Response<TecnicoDto>> atualizar(@PathVariable("id") Long id,
-                                                          @Valid @RequestBody TecnicoDto tecnicoDto, BindingResult  result) throws ParseException {
+    public ResponseEntity<Response<TecnicoDTO>> atualizar(@PathVariable("id") Long id,
+                                                          @Valid @RequestBody TecnicoDTO tecnicoDto, BindingResult  result) throws ParseException {
         log.info("Atualizar tecnico: {}", id);
-        Response<TecnicoDto> response = new Response<>();
+        Response<TecnicoDTO> response = new Response<>();
         validarDadosExistentes(tecnicoDto, result);
 
         Optional<Tecnico> tecnico =  this.tecnicoService.buscarPorId(id);
@@ -114,7 +114,7 @@ public class TecnicoController {
             response.getErros().add("Erro ao excluir o cliente. Registro não encontrado para o id "+id);
             return ResponseEntity.badRequest().body(response);
         }
-        auditoria.post(this.converterCadastroTecnicoDto(tecnico.get()), new TecnicoDto(), "Tecnico");
+        auditoria.post(this.converterCadastroTecnicoDto(tecnico.get()), new TecnicoDTO(), "Tecnico");
         this.tecnicoService.remover(id);
         return ResponseEntity.ok(response);
     }
@@ -123,15 +123,15 @@ public class TecnicoController {
 
 
 
-    private void atualizarDadosTecnico(Tecnico tecnico, TecnicoDto tecnicoDto, BindingResult result) {
+    private void atualizarDadosTecnico(Tecnico tecnico, TecnicoDTO tecnicoDto, BindingResult result) {
         tecnico.setNome(tecnicoDto.getNome());
     }
 
 
 
-    private TecnicoDto converterCadastroTecnicoDto(Tecnico tecnico) {
+    private TecnicoDTO converterCadastroTecnicoDto(Tecnico tecnico) {
 
-        TecnicoDto tecnicoDto = new TecnicoDto();
+        TecnicoDTO tecnicoDto = new TecnicoDTO();
 
         tecnicoDto.setId(tecnico.getId());
         tecnicoDto.setNome(tecnico.getNome());
@@ -141,7 +141,7 @@ public class TecnicoController {
 
 
 
-    private Tecnico converterDtoParaTecnico(TecnicoDto tecnicoDto, BindingResult result) {
+    private Tecnico converterDtoParaTecnico(TecnicoDTO tecnicoDto, BindingResult result) {
         Tecnico tecnico = new Tecnico();
 
         tecnico.setNome(tecnicoDto.getNome());
@@ -150,7 +150,7 @@ public class TecnicoController {
     }
 
 
-    private void validarDadosExistentes(TecnicoDto tecnicoDto, BindingResult result) {
+    private void validarDadosExistentes(TecnicoDTO tecnicoDto, BindingResult result) {
         this.tecnicoService.buscarPorNome(tecnicoDto.getNome())
                 .ifPresent(emp -> result.addError(new ObjectError("tecnico", "NOME já existente")));
     }

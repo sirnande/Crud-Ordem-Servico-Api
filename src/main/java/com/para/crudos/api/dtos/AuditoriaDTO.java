@@ -1,7 +1,7 @@
 package com.para.crudos.api.dtos;
 
 
-public class AuditoriaDto {
+public class AuditoriaDTO {
 
 
     private String id;
@@ -63,7 +63,7 @@ public class AuditoriaDto {
 
     @Override
     public String toString() {
-        return "AuditoriaDto{" +
+        return "AuditoriaDTO{" +
                 "id='" + id + '\'' +
                 ", objetoAntigo='" + objetoAntigo + '\'' +
                 ", objetoNovo='" + objetoNovo + '\'' +

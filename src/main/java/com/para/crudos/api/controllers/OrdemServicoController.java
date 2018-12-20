@@ -1,7 +1,7 @@
 package com.para.crudos.api.controllers;
 
 import com.para.crudos.api.auditoria.Auditoria;
-import com.para.crudos.api.dtos.OrdemServicoDto;
+import com.para.crudos.api.dtos.OrdemServicoDTO;
 import com.para.crudos.api.enums.Status;
 import com.para.crudos.api.model.Cliente;
 import com.para.crudos.api.model.Endereco;
@@ -53,17 +53,17 @@ public class OrdemServicoController {
     private int qtdPorPagina;
 
 
-    private Auditoria<OrdemServicoDto> auditoria = new Auditoria<>();
+    private Auditoria<OrdemServicoDTO> auditoria = new Auditoria<>();
 
 
     @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<Response<Page<OrdemServicoDto>>> listarPorClienteId(@PathVariable("clienteId") long clienteId,
+    public ResponseEntity<Response<Page<OrdemServicoDTO>>> listarPorClienteId(@PathVariable("clienteId") long clienteId,
                                                                               @RequestParam(value = "pag", defaultValue = "0") int pag,
                                                                               @RequestParam(value = "ord", defaultValue = "id") String ord,
                                                                               @RequestParam(value = "dir", defaultValue = "DESC") String dir){
 
         log.info("Buscando lançamento por ID de cliente: {}, página: {}", clienteId, pag);
-        Response<Page<OrdemServicoDto>>response = new Response<>();
+        Response<Page<OrdemServicoDTO>>response = new Response<>();
 
         PageRequest pageRequest =   PageRequest.of(pag, this.qtdPorPagina, Sort.Direction.valueOf(dir), ord);
         Page<OrdemServico> ordemServicos = this.ordemServicoService.buscarPorClienteId(clienteId, pageRequest);
@@ -72,7 +72,7 @@ public class OrdemServicoController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        Page<OrdemServicoDto> ordemServicoDtos = ordemServicos.map(ordemServico -> this.converterOrdemServicoDto(ordemServico));
+        Page<OrdemServicoDTO> ordemServicoDtos = ordemServicos.map(ordemServico -> this.converterOrdemServicoDto(ordemServico));
 
 
         response.setData(ordemServicoDtos);
@@ -83,10 +83,10 @@ public class OrdemServicoController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Response<OrdemServicoDto>> listarporId(@PathVariable("id") Long id){
+    public ResponseEntity<Response<OrdemServicoDTO>> listarporId(@PathVariable("id") Long id){
         log.info("Buscar orddem de servico por id: {}", id);
 
-        Response<OrdemServicoDto> response =  new Response<>();
+        Response<OrdemServicoDTO> response =  new Response<>();
         Optional<OrdemServico> ordemServico = this.ordemServicoService.buscarPorId(id);
 
         if(!ordemServico.isPresent()){
@@ -102,11 +102,11 @@ public class OrdemServicoController {
 
 
     @PostMapping("/cadastro-os")
-    public ResponseEntity<Response<OrdemServicoDto>> adicionar(@Valid @RequestBody OrdemServicoDto ordemServicoDto,
+    public ResponseEntity<Response<OrdemServicoDTO>> adicionar(@Valid @RequestBody OrdemServicoDTO ordemServicoDto,
                                                                BindingResult result) throws ParseException {
         log.info("Adicionar uma Ordem de Serviço: {}", ordemServicoDto.toString());
 
-        Response<OrdemServicoDto> response = new Response<>();
+        Response<OrdemServicoDTO> response = new Response<>();
         validarCliente(ordemServicoDto, result);
         validarEndereco(ordemServicoDto, result);
         validarTecnico(ordemServicoDto, result);
@@ -117,7 +117,7 @@ public class OrdemServicoController {
             result.getAllErrors().forEach(error -> response.getErros().add(error.getDefaultMessage()));
             return ResponseEntity.badRequest().body(response);
         }
-        this.auditoria.post(new OrdemServicoDto(), ordemServicoDto, "OrdemServico");
+        this.auditoria.post(new OrdemServicoDTO(), ordemServicoDto, "OrdemServicoService");
         this.ordemServicoService.persistir(ordemServico);
         response.setData(this.converterOrdemServicoDto(ordemServico));
         return ResponseEntity.ok(response);
@@ -125,10 +125,10 @@ public class OrdemServicoController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Response<OrdemServicoDto>> atualizar(@PathVariable("id") Long id,
-                                                               @Valid @RequestBody OrdemServicoDto ordemServicoDto, BindingResult  result) throws ParseException{
+    public ResponseEntity<Response<OrdemServicoDTO>> atualizar(@PathVariable("id") Long id,
+                                                               @Valid @RequestBody OrdemServicoDTO ordemServicoDto, BindingResult  result) throws ParseException{
         log.info("Atualizando Ordem de Servico: {}", ordemServicoDto.toString());
-        Response<OrdemServicoDto> response = new Response<>();
+        Response<OrdemServicoDTO> response = new Response<>();
         validarCliente(ordemServicoDto, result);
         validarEndereco(ordemServicoDto, result);
         validarTecnico(ordemServicoDto, result);
@@ -137,12 +137,12 @@ public class OrdemServicoController {
         Optional<OrdemServico> ordemServico = this.ordemServicoService.buscarPorId(id);
 
         if(!ordemServico.isPresent()){
-            result.addError(new ObjectError("OrdemServico","Error Ordem de Servico não encontrada para o id "+id));
+            result.addError(new ObjectError("OrdemServicoService","Error Ordem de Servico não encontrada para o id "+id));
            // response.getErros().add("Error Ordem de Servico não encontrada para o id "+id);
             ResponseEntity.badRequest().body(response);
         }
 
-        this.auditoria.post(this.converterOrdemServicoDto(ordemServico.get()), ordemServicoDto, "OrdemServico");
+        this.auditoria.post(this.converterOrdemServicoDto(ordemServico.get()), ordemServicoDto, "OrdemServicoService");
         ordemServico = Optional.of(this.converterDtoParaOrdemServico(ordemServicoDto, result));
       // ordemServico.get() = this.converterDtoParaOrdemServico(ordemServicoDto, result);
 
@@ -170,7 +170,7 @@ public class OrdemServicoController {
             response.getErros().add("Erro ao remover ordem de serviço. Registro não encotrado para o id "+id);
             return ResponseEntity.badRequest().body(response);
         }
-        auditoria.post(this.converterOrdemServicoDto(ordemServico.get()), new OrdemServicoDto(), "OrdemServico");
+        auditoria.post(this.converterOrdemServicoDto(ordemServico.get()), new OrdemServicoDTO(), "OrdemServicoService");
         this.ordemServicoService.remover(id);
         return ResponseEntity.ok(response);
     }
@@ -179,7 +179,7 @@ public class OrdemServicoController {
 
 
 
-    private OrdemServico converterDtoParaOrdemServico(OrdemServicoDto ordemServicoDto, BindingResult result) throws ParseException {
+    private OrdemServico converterDtoParaOrdemServico(OrdemServicoDTO ordemServicoDto, BindingResult result) throws ParseException {
 
         OrdemServico ordemServico = new OrdemServico();
 
@@ -211,7 +211,7 @@ public class OrdemServicoController {
     }
 
 
-    private void validarTecnico(OrdemServicoDto ordemServicoDto, BindingResult result) {
+    private void validarTecnico(OrdemServicoDTO ordemServicoDto, BindingResult result) {
         if(ordemServicoDto.getTecnico() == null){
             result.addError(new ObjectError("tecnico", "Tecnico não informado."));
             return;
@@ -225,7 +225,7 @@ public class OrdemServicoController {
     }
 
 
-    private void validarEndereco(OrdemServicoDto ordemServicoDto, BindingResult result) {
+    private void validarEndereco(OrdemServicoDTO ordemServicoDto, BindingResult result) {
         if(ordemServicoDto.getEndereco() == null){
             result.addError(new ObjectError("endereco", "CEP do endereco não informado"));
             return;
@@ -239,23 +239,24 @@ public class OrdemServicoController {
     }
 
 
-    private void validarCliente(OrdemServicoDto ordemServicoDto, BindingResult result) {
+    private void validarCliente(OrdemServicoDTO ordemServicoDto, BindingResult result) {
         if(ordemServicoDto.getCliente() == null){
             result.addError(new ObjectError("cliente", "Cliente não informado"));
             return;
         }
 
-        log.info("Validando cliente id: {}", ordemServicoDto.getCliente());
-        Optional<Cliente> cliente = this.clienteService.buscarPorId(ordemServicoDto.getCliente());
-        if(!cliente.isPresent()){
+        try {
+            log.info("Validando cliente id: {}", ordemServicoDto.getCliente());
+            this.clienteService.buscarPorId(ordemServicoDto.getCliente());
+        }catch(RuntimeException e){
             result.addError(new ObjectError("cliente", "Cliente não encontrado. ID inexixtente."));
         }
     }
 
 
 
-    private OrdemServicoDto converterOrdemServicoDto(OrdemServico ordemServico) {
-        OrdemServicoDto ordemServicoDto = new OrdemServicoDto();
+    private OrdemServicoDTO converterOrdemServicoDto(OrdemServico ordemServico) {
+        OrdemServicoDTO ordemServicoDto = new OrdemServicoDTO();
 
         ordemServicoDto.setId(ordemServico.getId());
         ordemServicoDto.setEspecificacao(ordemServico.getEspecificacao());

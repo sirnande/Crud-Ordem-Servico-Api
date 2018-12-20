@@ -3,7 +3,7 @@ package com.para.crudos.api.dtos;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
-public class OrdemServicoDto implements Serializable {
+public class OrdemServicoDTO implements Serializable {
 
     private Long id;
 
@@ -91,7 +91,7 @@ public class OrdemServicoDto implements Serializable {
 
     @Override
     public String toString() {
-        return "OrdemServicoDto{" +
+        return "OrdemServicoDTO{" +
                 "id=" + id +
                 ", especificacao='" + especificacao + '\'' +
                 ", dataAberta='" + dataAberta + '\'' +

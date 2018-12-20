@@ -1,7 +1,7 @@
 package com.para.crudos.api.controllers;
 
 import com.para.crudos.api.auditoria.Auditoria;
-import com.para.crudos.api.dtos.EnderecoDto;
+import com.para.crudos.api.dtos.EnderecoDTO;
 import com.para.crudos.api.model.Endereco;
 import com.para.crudos.api.response.Response;
 import com.para.crudos.api.services.EnderecoService;
@@ -29,14 +29,14 @@ public class EnderecoController {
     private EnderecoService enderecoService;
 
 
-    private Auditoria<EnderecoDto> auditoria = new Auditoria<>();
+    private Auditoria<EnderecoDTO> auditoria = new Auditoria<>();
 
     @PostMapping("/cadastro-endereco")
-    public ResponseEntity<Response<EnderecoDto>> cadastrar(@Valid @RequestBody EnderecoDto enderecoDto,
+    public ResponseEntity<Response<EnderecoDTO>> cadastrar(@Valid @RequestBody EnderecoDTO enderecoDto,
                                                            BindingResult result) throws NoSuchAlgorithmException{
         log.info("Cadastrando um novo endereço: {}", enderecoDto.toString());
 
-        Response<EnderecoDto> response = new Response<>();
+        Response<EnderecoDTO> response = new Response<>();
 
         validarDadosExistentes(enderecoDto, result);
         Endereco endereco = this.converteDtoParaEndereco(enderecoDto, result);
@@ -47,7 +47,7 @@ public class EnderecoController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        auditoria.post(new EnderecoDto(), enderecoDto, "Endereco");
+        auditoria.post(new EnderecoDTO(), enderecoDto, "Endereco");
 
         this.enderecoService.persistir(endereco);
         response.setData((this.converterCadastroEnderecoDto(endereco)));
@@ -56,10 +56,10 @@ public class EnderecoController {
 
 
     @GetMapping("/cep/{cep}")
-    public ResponseEntity<Response<EnderecoDto>> buscarPorCep(@PathVariable("cep") String cep){
+    public ResponseEntity<Response<EnderecoDTO>> buscarPorCep(@PathVariable("cep") String cep){
         log.info("Buscando endereco pelo cep: {}", cep);
 
-        Response<EnderecoDto> response =  new Response<>();
+        Response<EnderecoDTO> response =  new Response<>();
         Optional<Endereco> endereco = this.enderecoService.buscarPorCep(cep);
 
         if(!endereco.isPresent()){
@@ -76,11 +76,11 @@ public class EnderecoController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Response<EnderecoDto>> atualizar(@PathVariable("id") Long id,
-                                                        @Valid @RequestBody EnderecoDto enderecoDto, BindingResult  result) throws ParseException{
+    public ResponseEntity<Response<EnderecoDTO>> atualizar(@PathVariable("id") Long id,
+                                                           @Valid @RequestBody EnderecoDTO enderecoDto, BindingResult  result) throws ParseException{
         log.info("Atualizando Enderco : {}", enderecoDto.toString());
 
-        Response<EnderecoDto> response =  new Response<>();
+        Response<EnderecoDTO> response =  new Response<>();
         validarDadosExistentes(enderecoDto, result);
 
         Optional<Endereco> endereco = this.enderecoService.buscarPorId(id);
@@ -122,7 +122,7 @@ public class EnderecoController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        auditoria.post(this.converterCadastroEnderecoDto(endereco.get()), new EnderecoDto(), "Endereco");
+        auditoria.post(this.converterCadastroEnderecoDto(endereco.get()), new EnderecoDTO(), "Endereco");
         this.enderecoService.remover(id);
         return ResponseEntity.ok(response);
     }
@@ -130,7 +130,7 @@ public class EnderecoController {
 
 
 
-    private void atualizarDadosEndereco(Endereco endereco, EnderecoDto enderecoDto, BindingResult result) {
+    private void atualizarDadosEndereco(Endereco endereco, EnderecoDTO enderecoDto, BindingResult result) {
 
         if(!endereco.getCep().equals(enderecoDto.getCep()))
             endereco.setCep(enderecoDto.getCep());
@@ -142,8 +142,8 @@ public class EnderecoController {
 
 
 
-    private EnderecoDto converterCadastroEnderecoDto(Endereco endereco) {
-        EnderecoDto enderecoDto = new EnderecoDto();
+    private EnderecoDTO converterCadastroEnderecoDto(Endereco endereco) {
+        EnderecoDTO enderecoDto = new EnderecoDTO();
 
         enderecoDto.setId(endereco.getId());
         enderecoDto.setCep(endereco.getCep());
@@ -156,7 +156,7 @@ public class EnderecoController {
     }
 
 
-    private Endereco converteDtoParaEndereco(EnderecoDto enderecoDto, BindingResult result) {
+    private Endereco converteDtoParaEndereco(EnderecoDTO enderecoDto, BindingResult result) {
         Endereco endereco = new Endereco();
 
         endereco.setCep(enderecoDto.getCep());
@@ -169,7 +169,7 @@ public class EnderecoController {
     }
 
 
-    private void validarDadosExistentes(EnderecoDto enderecoDto, BindingResult result) {
+    private void validarDadosExistentes(EnderecoDTO enderecoDto, BindingResult result) {
         this.enderecoService.buscarPorCep(enderecoDto.getCep())
                 .ifPresent(emp -> result.addError(new ObjectError("endereco", "CEP já existente.")));
 

@@ -2,7 +2,7 @@ package com.para.crudos.api.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.para.crudos.api.dtos.EnderecoDto;
+import com.para.crudos.api.dtos.EnderecoDTO;
 import com.para.crudos.api.model.Endereco;
 import com.para.crudos.api.services.EnderecoService;
 import com.para.crudos.api.setup.UrlApi;
@@ -34,10 +34,10 @@ public class EnderecoControllerTest {
 
 
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
 
     @MockBean
-    EnderecoService enderecoService;
+    private EnderecoService enderecoService;
 
     private static final String URL_BASE = UrlApi.URL + "/enderecos";
 
@@ -93,7 +93,7 @@ public class EnderecoControllerTest {
     }
 
     @Test
-    @DisplayName("Retornar erro 400 ao tentar salvar um endereco com cep existente")
+    @DisplayName("Cadastrar endereco com CEP existente")
     public void testCadastrarEnderecoComCepExistente() throws Exception{
         Endereco endereco = this.obterDadosEndereco();
 
@@ -186,7 +186,7 @@ public class EnderecoControllerTest {
     }
 
     private String obterJsonRequisitPut() throws JsonProcessingException {
-        EnderecoDto enderecoDto = new EnderecoDto();
+        EnderecoDTO enderecoDto = new EnderecoDTO();
 
         enderecoDto.setId(null);
         enderecoDto.setRua("Avenida Colombo");
@@ -201,7 +201,7 @@ public class EnderecoControllerTest {
 
 
     private String obterJsonRequisitPost() throws JsonProcessingException {
-        EnderecoDto enderecoDto = new EnderecoDto();
+        EnderecoDTO enderecoDto = new EnderecoDTO();
 
         enderecoDto.setId(null);
         enderecoDto.setRua(RUA);

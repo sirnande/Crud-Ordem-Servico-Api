@@ -5,7 +5,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
-public class EnderecoDto implements Serializable {
+public class EnderecoDTO implements Serializable {
 
     private Long id;
     private String cep;
@@ -78,7 +78,7 @@ public class EnderecoDto implements Serializable {
 
     @Override
     public String toString() {
-        return "EnderecoDto{" +
+        return "EnderecoDTO{" +
                 "id=" + id +
                 ", cep='" + cep + '\'' +
                 ", rua='" + rua + '\'' +

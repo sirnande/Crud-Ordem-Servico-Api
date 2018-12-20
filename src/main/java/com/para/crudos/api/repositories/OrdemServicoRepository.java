@@ -18,7 +18,7 @@ import com.para.crudos.api.model.OrdemServico;
 @NamedQueries({
 	@NamedQuery(name = "OrdemServicorepository.findByClienteId",
 			query = "SELECT os "
-				  + "FROM OrdemServico os "
+				  + "FROM OrdemServicoService os "
 				  + "WHERE os.cliente.id = :clienteId")
 })
 public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long>{

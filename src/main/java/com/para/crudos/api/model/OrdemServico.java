@@ -106,7 +106,7 @@ public class OrdemServico implements Serializable{
 
 	@Override
 	public String toString() {
-		return "OrdemServico{" +
+		return "OrdemServicoService{" +
 				"id=" + id +
 				", especificacao='" + especificacao + '\'' +
 				", dataAberta=" + dataAberta +

@@ -5,7 +5,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
-public class TecnicoDto implements Serializable {
+public class TecnicoDTO implements Serializable {
 
     private Long id;
     private String nome;
@@ -31,7 +31,7 @@ public class TecnicoDto implements Serializable {
 
     @Override
     public String toString() {
-        return "TecnicoDto{" +
+        return "TecnicoDTO{" +
                 "id=" + id +
                 ", nome='" + nome + '\'' +
                 '}';

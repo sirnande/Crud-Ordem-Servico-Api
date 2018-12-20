@@ -1,47 +1,43 @@
 package com.para.crudos.api.services;
 
-import com.para.crudos.api.model.OrdemServico;
+import com.para.crudos.api.repositories.OrdemServicoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-public interface OrdemServicoService {
+@Service
+public class OrdemServicoService {
 
-    /**
-     * Persistrir uma nova Ordem de Servico na base de dados
-     *
-     * @param ordemServico
-     * @return OrdemServico
-     */
-    OrdemServico persistir(OrdemServico ordemServico);
+    private static final Logger log = LoggerFactory.getLogger(OrdemServicoService.class);
 
+    @Autowired
+    private OrdemServicoRepository ordemServicoRepository;
 
-    /**
-     * Buscar e retorna uma lista paginada de um determinado cliente
-     *
-     * @param id
-     * @param pageRequest
-     * @return Page<OrdemServico>
-     */
+    public com.para.crudos.api.model.OrdemServico persistir(com.para.crudos.api.model.OrdemServico ordemServico) {
+        log.info("Persistir OrdemServicoService: {}", ordemServico);
+        return this.ordemServicoRepository.save(ordemServico);
+    }
 
-    Page<OrdemServico>  buscarPorClienteId(Long id, PageRequest pageRequest);
+    public Page<com.para.crudos.api.model.OrdemServico> buscarPorClienteId(Long id, PageRequest pageRequest) {
+        log.info("Buscando ordem de sevico por id: {}", id);
+        return this.ordemServicoRepository.findByClienteId(id, pageRequest);
+    }
 
 
-    /**
-     * Buscar Ordem de servico por ID
-     *
-     * @param id
-     * @return Optonal<OrdemServico>
-     */
-    Optional<OrdemServico> buscarPorId(Long id);
+
+    public void remover(Long id) {
+        log.info("Removendo ordem de Servico id: {}", id);
+        this.ordemServicoRepository.deleteById(id);
+    }
 
 
-    /**
-     * Remove uma OrdemServico da basa de dados
-     *
-     * @param id
-     */
-    void remover(Long id);
-
+    public Optional<com.para.crudos.api.model.OrdemServico> buscarPorId(Long id) {
+        log.info("Buscar uma Ordem de Servico pelo id: {}", id);
+        return this.ordemServicoRepository.findById(id);
+    }
 }

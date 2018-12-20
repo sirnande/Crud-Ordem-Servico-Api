@@ -1,22 +1,19 @@
 package com.para.crudos.api.controllers;
 
 import com.para.crudos.api.auditoria.Auditoria;
-import com.para.crudos.api.dtos.ClienteDto;
+import com.para.crudos.api.dtos.ClienteDTO;
 import com.para.crudos.api.model.Cliente;
-import com.para.crudos.api.response.Response;
 import com.para.crudos.api.services.ClienteService;
 import com.para.crudos.api.setup.UrlApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(UrlApi.URL+"/clientes")
@@ -27,149 +24,86 @@ public class ClienteController {
     @Autowired
     private ClienteService clienteService;
 
-    private Auditoria<ClienteDto> auditoria =  new Auditoria<>();
+    @Autowired
+    private ConversionService conversionService;
+
+    private Auditoria<ClienteDTO> auditoria =  new Auditoria<>();
 
 
     @PostMapping("/cadastro-cliente")
-    public ResponseEntity<Response<ClienteDto>> cadastrar(@Valid @RequestBody ClienteDto clienteDto,
-                                                          BindingResult result) throws NoSuchAlgorithmException{
+    public ResponseEntity<ClienteDTO> cadastrar(@Valid @RequestBody ClienteDTO clienteDto){
         log.info("Cadastrando cliente: {}", clienteDto.toString());
-        Response<ClienteDto> response = new Response<>();
 
-        validarDadosExistentes(clienteDto, result);
-        Cliente cliente = this.converterDtoParaCliente(clienteDto, result);
+        this.clienteService.validarDadosExistentes(clienteDto);
 
-        if(result.hasErrors()){
-            log.error("Erro validando dados de cadastro Cliente: {}", result.getAllErrors());
-            result.getAllErrors().forEach(error -> response.getErros().add(error.getDefaultMessage()));
-            return ResponseEntity.badRequest().body(response);
-        }
+       // auditoria.post(new ClienteDTO(), clienteDto, "Cliente");
 
-        auditoria.post(new ClienteDto(), clienteDto, "cliente");
-        this.clienteService.persistir(cliente);
-        response.setData(this.converterCadastroClienteDto(cliente));
-        return ResponseEntity.ok(response);
+        this.clienteService.gravar(this.conversionService.convert(clienteDto, Cliente.class));
+
+
+        return ResponseEntity.ok(clienteDto);
     }
 
 
 
     @GetMapping("/cpf/{cpf}")
-    public ResponseEntity<Response<ClienteDto>> buscarPorCpf(@PathVariable("cpf") String cpf){
+    public ResponseEntity<ClienteDTO> buscarPorCpf(@PathVariable("cpf") String cpf){
         log.info("Buscando clinete por cpf: {}", cpf);
-        Response<ClienteDto> response = new Response<>();
-        Optional<Cliente> cliente = this.clienteService.buscarPorCpf(cpf);
-
-        if(!cliente.isPresent()){
-            log.info("Cliente não encontrado para o CPF: {}", cpf);
-            response.getErros().add("Cliente não encontrado para o CPF: " +cpf);
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        response.setData(this.converterCadastroClienteDto(cliente.get()));
-        return ResponseEntity.ok(response);
+        Cliente cliente = this.clienteService.buscarPorCpf(cpf);
+        return ResponseEntity.ok(this.conversionService.convert(cliente, ClienteDTO.class));
     }
 
 
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<Response<ClienteDto>> atualizar(@PathVariable("id") Long id,
-                                                          @Valid @RequestBody ClienteDto clienteDto,  BindingResult result) throws NoSuchAlgorithmException{
+    public ResponseEntity<ClienteDTO> atualizar(@PathVariable("id") Long id,
+                                                @Valid @RequestBody ClienteDTO clienteDto) throws NoSuchAlgorithmException{
         log.info("Atualizar cliente: {}", clienteDto.toString());
+        this.clienteService.buscarPorId(id);
+        //auditoria.post(this.conversionService.convert(this.clienteService.buscarPorId(id), ClienteDTO.class), clienteDto, "Cliente");
 
-        Response<ClienteDto> response = new Response<>();
+        clienteDto.setId(id);
+        this.clienteService.atualizar(this.conversionService.convert(clienteDto, Cliente.class));
 
-        Optional<Cliente> cliente =  this.clienteService.buscarPorId(id);
-        if(!cliente.isPresent()){
-            result.addError(new ObjectError("cliente", "Cliente não encontrado"));
-            response.getErros().add("Erro cliente não encontrado para o id "+ id);
-            return ResponseEntity.badRequest().body(response);
-        }
-
-
-        auditoria.post(this.converterCadastroClienteDto(cliente.get()), clienteDto, "cliente");
-
-        this.atualizarDadosCliente(cliente.get(), clienteDto, result);
-
-        if(result.hasErrors()){
-            log.error("Erro validando clinete: {}", result.getAllErrors());
-            result.getAllErrors().forEach(error -> response.getErros().add(error.getDefaultMessage()));
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        this.clienteService.persistir(cliente.get());
-        response.setData(this.converterCadastroClienteDto(cliente.get()));
-        return ResponseEntity.ok(response);
+       return ResponseEntity.ok(clienteDto);
 
     }
 
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<Response<String>> deletar(@PathVariable("id") Long id){
+    public ResponseEntity<String> deletar(@PathVariable("id") Long id){
         log.info("Removendo um cliente pelo id; {}", id);
-        Response<String> response =  new Response<>();
-        Optional<Cliente> cliente = this.clienteService.buscarPorId(id);
 
-        if(!cliente.isPresent()){
-            log.error("erro ao remover o cliente por ID: {} ser invalido", id);
-            response.getErros().add("Erro ao remover o cliente. Cliente não encontrado para o id "+id);
-            return ResponseEntity.badRequest().body(response);
-        }
-
-
-        auditoria.post(this.converterCadastroClienteDto(cliente.get()), new ClienteDto(), "cliente");
-
+        Cliente cliente = this.clienteService.buscarPorId(id);
+        //auditoria.post(this.clienteService.converterCadastroClienteDto(cliente), new ClienteDTO(), "Cliente");
         this.clienteService.remover(id);
-        return  ResponseEntity.ok(response);
 
-
-    }
-
-
-
-    private void atualizarDadosCliente(Cliente cliente, ClienteDto clienteDto, BindingResult result) {
-
-        cliente.setNome(clienteDto.getNome());
-        cliente.setEmail(clienteDto.getEmail());
-        cliente.setTelefone(clienteDto.getTelefone());
-        cliente.setCpf(clienteDto.getCpf());
+        return  ResponseEntity.ok("Cliente removido com sucesso...");
 
     }
+//
+//    public ClienteDTO converterCadastroClienteDto(Cliente cliente) {
+//        ClienteDTO clienteDto = new ClienteDTO();
+//
+//        clienteDto.setId(cliente.getId());
+//        clienteDto.setNome(cliente.getNome());
+//        clienteDto.setCpf(cliente.getCpf());
+//        clienteDto.setEmail(cliente.getEmail());
+//        clienteDto.setTelefone(cliente.getTelefone());
+//
+//        return clienteDto;
+//    }
+//
+//    public Cliente converterDtoParaCliente(ClienteDTO clienteDto){
+//        Cliente cliente = new Cliente();
+//
+//        cliente.setId(clienteDto.getId());
+//        cliente.setNome(clienteDto.getNome());
+//        cliente.setCpf(clienteDto.getCpf());
+//        cliente.setEmail(clienteDto.getEmail());
+//        cliente.setTelefone(clienteDto.getTelefone());
+//
+//        return cliente;
+//    }
 
-
-
-    private ClienteDto converterCadastroClienteDto(Cliente cliente) {
-        ClienteDto clienteDto = new ClienteDto();
-
-        clienteDto.setId(cliente.getId());
-        clienteDto.setNome(cliente.getNome());
-        clienteDto.setCpf(cliente.getCpf());
-        clienteDto.setEmail(cliente.getEmail());
-        clienteDto.setTelefone(cliente.getTelefone());
-
-        return clienteDto;
-    }
-
-
-    private void validarDadosExistentes(ClienteDto clienteDto, BindingResult result) {
-
-        this.clienteService.buscarPorCpf(clienteDto.getCpf())
-                .ifPresent(emp -> result.addError(new ObjectError("cliente","CPF já existente.")));
-        this.clienteService.buscarPorEmail(clienteDto.getEmail())
-                .ifPresent(emp -> result.addError(new ObjectError("cliente","EMAIL já existente")));
-
-    }
-
-
-
-    private Cliente converterDtoParaCliente(ClienteDto clienteDto, BindingResult result){
-        Cliente cliente = new Cliente();
-
-        cliente.setId(clienteDto.getId());
-        cliente.setNome(clienteDto.getNome());
-        cliente.setCpf(clienteDto.getCpf());
-        cliente.setEmail(clienteDto.getEmail());
-        cliente.setTelefone(clienteDto.getTelefone());
-
-        return cliente;
-    }
 }

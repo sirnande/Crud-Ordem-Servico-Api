@@ -1,8 +1,8 @@
 package com.para.crudos.api.auditoria;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.para.crudos.api.dtos.AuditoriaDto;
+import com.para.crudos.api.dtos.AuditoriaDTO;
+import com.para.crudos.api.exceptions.ValidacaoException;
 import org.springframework.web.client.RestTemplate;
 
 public class Auditoria<T> {
@@ -12,19 +12,19 @@ public class Auditoria<T> {
             final String url = "http://localhost:8090/crud/api/auditoria/save/";
             ObjectMapper mapper =  new ObjectMapper();
 
-            AuditoriaDto auditoriaDto = new AuditoriaDto();
+            AuditoriaDTO auditoriaDto = new AuditoriaDTO();
             auditoriaDto.setObjetoAntigo(mapper.writeValueAsString(objetoAntigo));
             auditoriaDto.setObjetoNovo(mapper.writeValueAsString(objetoNovo));
             auditoriaDto.setEntidade(entidade);
 
             RestTemplate restTemplate = new RestTemplate();
 
-            AuditoriaDto result = restTemplate.postForObject(url, auditoriaDto, AuditoriaDto.class);
+            AuditoriaDTO result = restTemplate.postForObject(url, auditoriaDto, AuditoriaDTO.class);
 
             System.out.println(result);
 
         }catch(Exception ex){
-            throw new RuntimeException(ex);
+            throw new ValidacaoException("Erro ao se conectar com o servidor de auditoria");
         }
 
     }

@@ -7,7 +7,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
-public class ClienteDto implements Serializable {
+public class ClienteDTO implements Serializable {
 
     private Long id;
     private String nome;
@@ -69,7 +69,7 @@ public class ClienteDto implements Serializable {
 
     @Override
     public String toString() {
-        return "ClienteDto{" +
+        return "ClienteDTO{" +
                 "id=" + id +
                 ", nome='" + nome + '\'' +
                 ", telefone='" + telefone + '\'' +

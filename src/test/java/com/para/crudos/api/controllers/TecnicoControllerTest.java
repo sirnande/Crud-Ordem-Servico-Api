@@ -2,7 +2,7 @@ package com.para.crudos.api.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.para.crudos.api.dtos.TecnicoDto;
+import com.para.crudos.api.dtos.TecnicoDTO;
 import com.para.crudos.api.model.Tecnico;
 import com.para.crudos.api.services.TecnicoService;
 import com.para.crudos.api.setup.UrlApi;
@@ -155,7 +155,7 @@ public class TecnicoControllerTest {
     }
 
     private String obterJsonRequisitPost() throws JsonProcessingException{
-        TecnicoDto tecnicoDto = new TecnicoDto();
+        TecnicoDTO tecnicoDto = new TecnicoDTO();
 
         tecnicoDto.setId(null);
         tecnicoDto.setNome(NOME);

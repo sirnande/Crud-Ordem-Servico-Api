@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class OrdemServicoServiceTest {
+public class OrdemServicoServiceServiceTest {
 
     @MockBean
     private OrdemServicoRepository ordemServicoRepository;

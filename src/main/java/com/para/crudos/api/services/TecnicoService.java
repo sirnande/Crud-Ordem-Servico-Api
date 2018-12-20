@@ -1,45 +1,43 @@
 package com.para.crudos.api.services;
 
 import com.para.crudos.api.model.Tecnico;
+import com.para.crudos.api.repositories.TecnicoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface TecnicoService {
+@Service
+public class TecnicoService{
 
-    /**
-     * Persistir um tecnico  na base dedados
-     *
-     * @param tecnico
-     * @return Tecnico
-     */
-    Tecnico persistir(Tecnico tecnico);
+    private static  final Logger log = LoggerFactory.getLogger(TecnicoService.class);
+
+    @Autowired
+    private TecnicoRepository tecnicoRepository;
 
 
-    /**
-     * Buscar e retorna um tecnipor por id
-     *
-     * @param id
-     * @return Optional<Tecnico>
-     */
-    Optional<Tecnico> buscarPorId(Long id);
+
+    public Tecnico persistir(Tecnico tecnico) {
+        log.info("Persistir um tecnico: {}", tecnico);
+        return this.tecnicoRepository.save(tecnico);
+    }
 
 
-    /**
-     * Buscar e retorna uma lista de tecnico dado um nome
-     *
-     * @param nome
-     * @return List<Tecnico>
-     */
-    Optional<Tecnico> buscarPorNome(String nome);
+    public Optional<Tecnico> buscarPorId(Long id) {
+        return this.tecnicoRepository.findById(id);
+    }
+
+    public Optional<Tecnico> buscarPorNome(String nome) {
+        log.info("Buscar tecnico por nome: {}", nome);
+        return Optional.ofNullable(this.tecnicoRepository.findByNome(nome));
+    }
 
 
-    /**
-     * Deleteandoum tecnico por Id
-     *
-     * @param id
-     */
-    void remover(Long id);
 
-
+    public void remover(Long id) {
+        log.info("Deletando um novo tecnico por id: {}", id);
+        this.tecnicoRepository.deleteById(id);
+    }
 }
