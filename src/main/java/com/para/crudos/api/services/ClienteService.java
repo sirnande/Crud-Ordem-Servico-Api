@@ -1,5 +1,6 @@
 package com.para.crudos.api.services;
 
+import com.para.crudos.api.auditoria.Auditoria;
 import com.para.crudos.api.dtos.ClienteDTO;
 import com.para.crudos.api.exceptions.ValidacaoException;
 import com.para.crudos.api.model.Cliente;
@@ -7,6 +8,7 @@ import com.para.crudos.api.repositories.ClienteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -21,17 +23,38 @@ public class ClienteService implements Serializable {
     private ClienteRepository clienteRepository;
 
 
-     public Cliente atualizar(Cliente cliente){
-        log.info("Atualizando cliente: {}", cliente.toString());
-        return Optional.ofNullable(this.clienteRepository.save(cliente))
-                .orElseThrow(() -> new ValidacaoException("Erro ao atualizar cliente  "+ cliente.toString()));
+    @Autowired
+    private ConversionService conversionService;
+
+
+    Auditoria<ClienteDTO>  auditoria = new Auditoria<>();
+
+
+    public ClienteDTO gravar(ClienteDTO clienteDto){
+        log.info("Criando um novo cliente: {}", clienteDto.toString());
+
+        validarDadosExistentes(clienteDto);
+
+        //auditoria.post(new ClienteDTO(), clienteDto, "Cliente");
+
+        Cliente cliente = Optional.ofNullable(this.clienteRepository.save(this.conversionService.convert(clienteDto, Cliente.class)))
+                .orElseThrow(() -> new ValidacaoException("Erro ao criar um novo cliente"+ clienteDto.toString()));
+
+        return this.conversionService.convert(cliente, ClienteDTO.class);
     }
 
-    public Cliente gravar(Cliente cliente){
-        log.info("Criando um novo cliente: {}", cliente.toString());
-        return Optional.ofNullable(this.clienteRepository.save(cliente))
-                .orElseThrow(() -> new ValidacaoException("Erro ao criar um novo cliente"+ cliente.toString()));
+    public ClienteDTO atualizar(ClienteDTO clienteDto){
+        log.info("Atualizando cliente: {}", clienteDto.toString());
+
+        return this.conversionService.convert(
+                    Optional.ofNullable(this.clienteRepository.save(this.conversionService.convert(clienteDto, Cliente.class)))
+                            .orElseThrow(() -> new ValidacaoException("Erro ao atualizar cliente  "+ clienteDto.toString())),
+
+                    ClienteDTO.class
+                );
     }
+
+
 
     public Cliente buscarPorId(Long id) {
         log.info("Buscar um cliente pelo id: {}", id);
@@ -39,10 +62,15 @@ public class ClienteService implements Serializable {
                 .orElseThrow(() -> new ValidacaoException("Cliente não encontrado para o ID: "+id));
     }
 
-    public Cliente buscarPorCpf(String cpf) {
+    public ClienteDTO buscarPorCpf(String cpf) {
         log.info("Buscando por cliente pelo cpf: }", cpf );
-        return Optional.ofNullable(this.clienteRepository.findByCpf(cpf))
-                .orElseThrow(() -> new ValidacaoException("Cliente não encontrado para o CPF: " + cpf));
+
+        return this.conversionService.convert(
+                Optional.ofNullable(this.clienteRepository.findByCpf(cpf))
+                        .orElseThrow(() -> new ValidacaoException("Cliente não encontrado para o CPF: " + cpf)),
+
+                ClienteDTO.class
+        );
     }
 
     public Cliente buscarPorNome(String nome) {
@@ -63,9 +91,14 @@ public class ClienteService implements Serializable {
                 .orElseThrow(() -> new ValidacaoException("Cliente não encontrado para o EMAIL: "+ email));
     }
 
-    public void remover(Long id) {
+    public String remover(Long id) {
         log.info("Removendo um cliente da base de dados com  id: []", id);
+
+        Cliente cliente = buscarPorId(id);
+        auditoria.post(this.conversionService.convert(cliente, ClienteDTO.class), new ClienteDTO(), "Cliente");
         this.clienteRepository.deleteById(id);
+
+        return "Cliente excluido com sucesso....";
     }
 
 

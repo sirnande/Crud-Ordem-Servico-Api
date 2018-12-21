@@ -232,10 +232,8 @@ public class OrdemServicoController {
         }
 
         log.info("Validando endereco cep: {}", ordemServicoDto.getEndereco());
-        Optional<Endereco> endereco = this.enderecoService.buscarPorId(ordemServicoDto.getEndereco());
-        if(!endereco.isPresent()){
-            result.addError(new ObjectError("endereco", "Endereco não encontrado. CEP inexistente."));
-        }
+        Endereco endereco = this.enderecoService.buscarPorId(ordemServicoDto.getEndereco());
+
     }
 
 
