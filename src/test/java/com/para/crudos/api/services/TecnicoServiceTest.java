@@ -1,6 +1,7 @@
 package com.para.crudos.api.services;
 
 
+import com.para.crudos.api.dtos.TecnicoDTO;
 import com.para.crudos.api.model.Tecnico;
 import com.para.crudos.api.repositories.TecnicoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,21 +40,21 @@ public class TecnicoServiceTest {
     }
 
     @Test
-    public void testPersistirTecnico(){
-        Tecnico tecnico = this.tecnicoService.persistir(new Tecnico());
-        assertNotNull(tecnico);
+    public void testSalvarTecnico(){
+        TecnicoDTO tecnicoDTO = this.tecnicoService.salvar(new TecnicoDTO());
+        assertNotNull(tecnicoDTO);
     }
 
     @Test
     public void testbuscarPorId(){
-        Optional<Tecnico> tecnico = this.tecnicoService.buscarPorId(1L);
-        assertTrue(tecnico.isPresent());
+        TecnicoDTO tecnicoDTO = this.tecnicoService.buscarPorId(1L);
+        assertTrue(tecnicoDTO != null);
     }
 
     @Test
     public void testBuscarPorNome(){
-        Optional<Tecnico> tecnico = this.tecnicoService.buscarPorNome("teste");
-        assertTrue(tecnico.isPresent());
+        TecnicoDTO tecnicoDTO = this.tecnicoService.buscarPorNome("teste");
+        assertTrue(tecnicoDTO != null);
     }
 
 }

@@ -212,16 +212,16 @@ public class OrdemServicoController {
 
 
     private void validarTecnico(OrdemServicoDTO ordemServicoDto, BindingResult result) {
-        if(ordemServicoDto.getTecnico() == null){
-            result.addError(new ObjectError("tecnico", "Tecnico não informado."));
-            return;
-        }
-
-        log.info("Validando Tecnico id: {}", ordemServicoDto.getTecnico());
-        Optional<Tecnico> tecnico = this.tecnicoService.buscarPorId(ordemServicoDto.getTecnico());
-        if(!tecnico.isPresent()){
-            result.addError(new ObjectError("tecnico", "Tecnico não encontrado. ID inexixtente."));
-        }
+//        if(ordemServicoDto.getTecnico() == null){
+//            result.addError(new ObjectError("tecnico", "Tecnico não informado."));
+//            return;
+//        }
+//
+//        log.info("Validando Tecnico id: {}", ordemServicoDto.getTecnico());
+//        Optional<Tecnico> tecnico = this.tecnicoService.buscarPorId(ordemServicoDto.getTecnico());
+//        if(!tecnico.isPresent()){
+//            result.addError(new ObjectError("tecnico", "Tecnico não encontrado. ID inexixtente."));
+//        }
     }
 
 

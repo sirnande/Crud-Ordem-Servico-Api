@@ -1,5 +1,6 @@
 package com.para.crudos.api.services;
 
+import com.para.crudos.api.dtos.ClienteDTO;
 import com.para.crudos.api.model.Cliente;
 import com.para.crudos.api.repositories.ClienteRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,8 +45,8 @@ public class ClienteServiceTest {
     @Test
     @DisplayName("Persistindo um cliente na base de dado")
     public void testPersistirCliente(){
-        Cliente cliente = this.clienteService.gravar(new Cliente());
-        assertNotNull(cliente);
+        ClienteDTO clienteDTO = this.clienteService.gravar(new ClienteDTO());
+        assertNotNull(clienteDTO);
     }
 
     @Test
@@ -58,8 +59,8 @@ public class ClienteServiceTest {
     @Test
     @DisplayName("Tem que buscar e retorna um clinete dado um cpf")
     public void testbuscarClientePorCpf(){
-        Cliente cliente = this.clienteService.buscarPorCpf("123456789");
-        assertTrue(cliente!=null);
+        ClienteDTO clienteDTO = this.clienteService.buscarPorCpf("123456789");
+        assertTrue(clienteDTO!=null);
     }
 
     @Test

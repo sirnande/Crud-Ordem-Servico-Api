@@ -59,7 +59,7 @@ public class ClienteControllerTest {
         ClienteDTO clienteDto = this.obterDadosDto(cliente);
 
         when(this.clienteService.buscarPorId(cliente.getId())).thenReturn(cliente);
-        when(this.clienteService.buscarPorCpf(cliente.getCpf())).thenReturn(cliente);
+        when(this.clienteService.buscarPorCpf(cliente.getCpf())).thenReturn(clienteDto);
         when(this.clienteService.buscarPorEmail(cliente.getEmail())).thenReturn(cliente);
         when(this.clienteService.buscarPorNome(cliente.getNome())).thenReturn(cliente);
         when(this.clienteService.buscarPorTelefone(cliente.getTelefone())).thenReturn(cliente);
@@ -83,8 +83,8 @@ public class ClienteControllerTest {
     @DisplayName("Tentar buscar um cliente por cpf")
     public void testBuscarClienteCpfValido() throws Exception{
 
-        Cliente cliente = this.obterDadosCliente();
-        when(this.clienteService.buscarPorCpf(cliente.getCpf())).thenReturn(cliente);
+        ClienteDTO clienteDto = this.obterDadosDto(this.obterDadosCliente());
+        when(this.clienteService.buscarPorCpf(clienteDto.getCpf())).thenReturn(clienteDto);
 
         mvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/cpf/{cpf}", CPF))
                 .andExpect(status().isOk())

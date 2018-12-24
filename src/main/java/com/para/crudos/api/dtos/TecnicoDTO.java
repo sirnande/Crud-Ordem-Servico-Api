@@ -1,11 +1,12 @@
 package com.para.crudos.api.dtos;
 
+import com.para.crudos.api.model.Tecnico;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
-public class TecnicoDTO implements Serializable {
+public class TecnicoDTO extends Tecnico implements Serializable {
 
     private Long id;
     private String nome;
