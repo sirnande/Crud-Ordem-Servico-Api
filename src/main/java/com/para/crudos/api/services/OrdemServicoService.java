@@ -3,7 +3,6 @@ package com.para.crudos.api.services;
 import com.para.crudos.api.auditoria.Auditoria;
 import com.para.crudos.api.dtos.OrdemServicoDTO;
 import com.para.crudos.api.exceptions.ValidacaoException;
-import com.para.crudos.api.model.Endereco;
 import com.para.crudos.api.model.OrdemServico;
 import com.para.crudos.api.repositories.OrdemServicoRepository;
 import org.slf4j.Logger;
@@ -14,14 +13,10 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrdemServicoService {
@@ -63,6 +58,8 @@ public class OrdemServicoService {
         ordemServico = this.ordemServicoRepository.save(ordemServico);
 
         ordemServicoDTO = this.conversionService.convert(ordemServico, OrdemServicoDTO.class);
+
+        auditoria.post(new OrdemServicoDTO(), ordemServicoDTO, "OrdemServico");
 
         return ordemServicoDTO;
     }
@@ -108,7 +105,7 @@ public class OrdemServicoService {
         validarCliente(ordemServicoDTO);
         validarEndereco(ordemServicoDTO);
         validarTecnico(ordemServicoDTO);
-
+        auditoria.post(this.conversionService.convert(ordemServico, OrdemServicoDTO.class), ordemServicoDTO, "OrdemServico");
         ordemServico = this.conversionService.convert(ordemServicoDTO, OrdemServico.class);
         this.ordemServicoRepository.save(ordemServico);
 
@@ -119,7 +116,8 @@ public class OrdemServicoService {
 
     public String remover(Long id) {
         log.info("Removendo ordem de Servico id: {}", id);
-        buscarPorId(id);
+        OrdemServicoDTO ordemServicoDTO = buscarPorId(id);
+        auditoria.post(ordemServicoDTO, new OrdemServicoDTO(), "OrdemServico");
         this.ordemServicoRepository.deleteById(id);
 
         return "Ordem de servico excluido com sucesso...";
