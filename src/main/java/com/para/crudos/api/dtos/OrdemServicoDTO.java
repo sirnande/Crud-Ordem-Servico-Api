@@ -40,6 +40,7 @@ public class OrdemServicoDTO implements Serializable {
         this.especificacao = especificacao;
     }
 
+    @NotEmpty(message = "Data de abertura não deve ser vazio")
     public String getDataAberta() {
         return dataAberta;
     }
@@ -57,6 +58,7 @@ public class OrdemServicoDTO implements Serializable {
     }
 
 
+    @NotEmpty(message = "O Status da ordem de servico não deve ser vazio")
     public String getStatus() {
         return status;
     }
@@ -64,6 +66,7 @@ public class OrdemServicoDTO implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+
 
     public Long getCliente() {
         return clienteId;
@@ -73,6 +76,7 @@ public class OrdemServicoDTO implements Serializable {
         this.clienteId = cliente;
     }
 
+
     public Long getTecnico() {
         return tecnicoId;
     }
@@ -80,6 +84,7 @@ public class OrdemServicoDTO implements Serializable {
     public void setTecnico(Long tecnico) {
         this.tecnicoId = tecnico;
     }
+
 
     public Long getEndereco() {
         return enderecoId;

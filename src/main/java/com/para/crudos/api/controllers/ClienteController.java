@@ -41,6 +41,7 @@ public class ClienteController {
     public ResponseEntity<ClienteDTO> atualizar(@PathVariable("id") Long id,
                                                 @Valid @RequestBody ClienteDTO clienteDto){
         log.info("Atualizar cliente: {}", clienteDto.toString());
+        clienteDto.setId(id);
        return ResponseEntity.ok().body(this.clienteService.atualizar(clienteDto));
     }
 

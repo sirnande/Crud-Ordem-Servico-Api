@@ -5,25 +5,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.para.crudos.api.dtos.ClienteDTO;
 import com.para.crudos.api.exceptions.ValidacaoException;
 import com.para.crudos.api.model.Cliente;
+import com.para.crudos.api.repositories.ClienteRepository;
 import com.para.crudos.api.services.ClienteService;
 import com.para.crudos.api.setup.UrlApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,8 +43,14 @@ public class ClienteControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
+    @Mock
     private ClienteService clienteService;
+
+    @MockBean
+    private ClienteRepository clienteRepository;
+
+    @Autowired
+    private ConversionService conversionService;
 
 
     private static final String URL_BASE = UrlApi.URL+"/clientes";
@@ -67,6 +77,44 @@ public class ClienteControllerTest {
     }
 
 
+
+
+    @Test
+    @DisplayName("tentar cadastrar um cliente")
+    public void testCadastrarCliente() throws Exception{
+
+        ClienteDTO clienteDTO =  obterDadosDto(obterDadosCliente());
+        clienteDTO.setId(null);
+        when(this.clienteService.gravar(clienteDTO)).thenReturn(obterDadosDto(obterDadosCliente()));
+        when(this.clienteRepository.save(Mockito.any())).thenReturn(obterDadosCliente());
+        mvc.perform(MockMvcRequestBuilders.post(URL_BASE + "/cadastro-cliente")
+                        .content(this.obterJsonRequisicaoPost())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nome").value(NOME))
+                    .andExpect(jsonPath("$.cpf").value(CPF))
+                    .andExpect(jsonPath("$.telefone").value(TELEFONE))
+                    .andExpect(jsonPath("$.email").value(EMAIL));
+    }
+
+    @Test
+    @DisplayName("Retorna erro CPF já existente ao cadastrar um cliente")
+    public void testCadastrarClienteCpfExistente() throws Exception {
+//        doThrow(new ValidacaoException("CPF já existe")).when(this.clienteService).validarDadosExistentes(Mockito.any());
+        ClienteDTO clienteDTO = obterDadosDto(obterDadosCliente());
+        when(this.clienteService.gravar(clienteDTO)).thenReturn(obterDadosDto(obterDadosCliente()));
+        when(this.clienteRepository.findByCpf(clienteDTO.getCpf())).thenReturn(obterDadosCliente());
+
+        mvc.perform(MockMvcRequestBuilders.post(URL_BASE + "/cadastro-cliente")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.obterJsonRequisicaoPost()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensagemDoErroGerado").value("CPF já existe"));
+    }
+
+
+
     @Test
     @DisplayName("tentar buscar cliente com cpf invalido e gerar erro")
     public void testBuscarClenteCpfInvalido() throws Exception{
@@ -85,7 +133,7 @@ public class ClienteControllerTest {
 
         ClienteDTO clienteDto = this.obterDadosDto(this.obterDadosCliente());
         when(this.clienteService.buscarPorCpf(clienteDto.getCpf())).thenReturn(clienteDto);
-
+        when(this.clienteRepository.findByCpf(clienteDto.getCpf())).thenReturn(obterDadosCliente());
         mvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/cpf/{cpf}", CPF))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome", equalTo(NOME)))
@@ -94,44 +142,19 @@ public class ClienteControllerTest {
                 .andExpect(jsonPath("$.email", equalTo(EMAIL)));
     }
 
-    @Test
-    @DisplayName("tentar cadastrar um cliente")
-    public void testCadastrarCliente() throws Exception{
-
-        mvc.perform(MockMvcRequestBuilders.post(URL_BASE + "/cadastro-cliente")
-                        .content(this.obterJsonRequisicaoPost())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.nome").value(NOME))
-                    .andExpect(jsonPath("$.cpf").value(CPF))
-                    .andExpect(jsonPath("$.telefone").value(TELEFONE))
-                    .andExpect(jsonPath("$.email").value(EMAIL));
-    }
-
-    @Test
-    @DisplayName("Retorna erro CPF já existente ao cadastrar um cliente")
-    public void testCadastrarClienteCpfExistente() throws Exception {
-
-
-        doThrow(new ValidacaoException("CPF já existe")).when(this.clienteService).validarDadosExistentes(Mockito.any());
-
-        mvc.perform(MockMvcRequestBuilders.post(URL_BASE + "/cadastro-cliente")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.obterJsonRequisicaoPost()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.mensagemDoErroGerado").value("CPF já existe"));
-    }
-
 
 
     @Test
     @DisplayName("Atualizar cliente dado um detrminado Id")
     public void testAtualizarClientePorId() throws Exception{
         Cliente cliente =  this.obterDadosCliente();
-        ClienteDTO clienteDto = this.obterDadosDto(cliente);
+        ClienteDTO clienteDTOAnt = this.conversionService.convert(cliente, ClienteDTO.class);
+        ClienteDTO clienteDto = this.conversionService.convert(cliente, ClienteDTO.class);
         clienteDto.setEmail(EMAIL_NOVO);
 
+        when(this.clienteService.atualizar(clienteDTOAnt)).thenReturn(clienteDto);
+        when(this.clienteRepository.findById(clienteDto.getId())).thenReturn(Optional.of(cliente));
+        when(this.clienteRepository.save(Mockito.any())).thenReturn(this.conversionService.convert(clienteDto, Cliente.class));
       //  when(this.clienteService.converterCadastroClienteDto(Mockito.any())).thenReturn(clienteDto);
 
         mvc.perform(MockMvcRequestBuilders.put(URL_BASE +"/id/{id}", 1)
@@ -149,17 +172,20 @@ public class ClienteControllerTest {
     @Test
     @DisplayName("Retorna erro ao tentar atualizar um cliente por um id errado")
     public void testAtualizarClientePorIdInexistente() throws Exception {
-        Cliente cliente = this.obterDadosCliente();
+        Cliente cliente =  this.obterDadosCliente();
+        ClienteDTO clienteDTOAnt = this.conversionService.convert(cliente, ClienteDTO.class);
+        ClienteDTO clienteDto = this.conversionService.convert(cliente, ClienteDTO.class);
+        clienteDto.setEmail(EMAIL_NOVO);
 
-       // when(this.clienteService.buscarPorId(cliente.getId())).thenReturn(cliente);
-        doThrow(new ValidacaoException("Erro cliente não encontrado para o id 3")).when(this.clienteService).buscarPorId(Mockito.anyLong());
-
+        when(this.clienteService.atualizar(clienteDTOAnt)).thenReturn(clienteDto);
+        when(this.clienteRepository.findById(clienteDto.getId())).thenReturn(Optional.of(cliente));
+        when(this.clienteRepository.save(Mockito.any())).thenReturn(this.conversionService.convert(clienteDto, Cliente.class));
         mvc.perform(
                 MockMvcRequestBuilders.put(URL_BASE + "/id/{id}",3)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.obterJsonRequsicaoPut()))
             .andExpect(status().is(400))
-            .andExpect(jsonPath("$.mensagemDoErroGerado").value("Erro cliente não encontrado para o id 3"));
+            .andExpect(jsonPath("$.mensagemDoErroGerado").value("Cliente não encontrado para o ID: 3"));
 
 
     }
@@ -169,10 +195,13 @@ public class ClienteControllerTest {
     public void testDeletarClientePorId() throws Exception {
         Cliente cliente = this.obterDadosCliente();
 
+        when(this.clienteService.remover(cliente.getId())).thenReturn(Mockito.anyString());
         when(this.clienteService.buscarPorId(cliente.getId())).thenReturn(cliente);
+        when(this.clienteRepository.findById(cliente.getId())).thenReturn(Optional.of(cliente));
 
         mvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/id/{id}", 1))
-        .andExpect(status().isOk());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$").value("Cliente excluido com sucesso...."));
     }
 
 
@@ -180,13 +209,14 @@ public class ClienteControllerTest {
     @DisplayName("Retorna erro ao tentar excluir um cliente por um id inexistente")
     public void testDeletarClientePorIdInexistente() throws Exception{
         Cliente cliente = this.obterDadosCliente();
-//
-//        when(this.clienteService.buscarPorId(cliente.getId())).thenReturn(cliente);
-        doThrow(new ValidacaoException("Erro ao remover o cliente. Cliente não encontrado para o id 2")).when(this.clienteService).buscarPorId(Mockito.anyLong());
+
+        when(this.clienteService.remover(cliente.getId())).thenReturn(Mockito.anyString());
+        when(this.clienteService.buscarPorId(cliente.getId())).thenReturn(cliente);
+        when(this.clienteRepository.findById(cliente.getId())).thenReturn(Optional.of(cliente));
 
         mvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/id/{id}", 2))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.mensagemDoErroGerado").value("Erro ao remover o cliente. Cliente não encontrado para o id 2"));
+                .andExpect(jsonPath("$.mensagemDoErroGerado").value("Cliente não encontrado para o ID: 2"));
     }
 
 

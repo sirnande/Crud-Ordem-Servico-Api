@@ -45,10 +45,12 @@ public class ClienteService implements Serializable {
 
     public ClienteDTO atualizar(ClienteDTO clienteDto){
         log.info("Atualizando cliente: {}", clienteDto.toString());
+        Cliente clienteAnt = buscarPorId(clienteDto.getId());
+        Cliente cliente = Optional.ofNullable(this.clienteRepository.save(this.conversionService.convert(clienteDto, Cliente.class)))
+                .orElseThrow(() -> new ValidacaoException("Erro ao atualizar cliente  "+ clienteDto.toString()));
 
         return this.conversionService.convert(
-                    Optional.ofNullable(this.clienteRepository.save(this.conversionService.convert(clienteDto, Cliente.class)))
-                            .orElseThrow(() -> new ValidacaoException("Erro ao atualizar cliente  "+ clienteDto.toString())),
+                   cliente,
 
                     ClienteDTO.class
                 );
@@ -95,7 +97,7 @@ public class ClienteService implements Serializable {
         log.info("Removendo um cliente da base de dados com  id: []", id);
 
         Cliente cliente = buscarPorId(id);
-        auditoria.post(this.conversionService.convert(cliente, ClienteDTO.class), new ClienteDTO(), "Cliente");
+       // auditoria.post(this.conversionService.convert(cliente, ClienteDTO.class), new ClienteDTO(), "Cliente");
         this.clienteRepository.deleteById(id);
 
         return "Cliente excluido com sucesso....";
@@ -105,11 +107,11 @@ public class ClienteService implements Serializable {
     public void validarDadosExistentes(ClienteDTO clienteDto) {
 
 
-        if(this.buscarPorCpf(clienteDto.getCpf()) != null)
+        if(this.clienteRepository.findByCpf(clienteDto.getCpf()) != null)
             throw new ValidacaoException("CPF já existe");
 
 
-        if (this.buscarPorEmail(clienteDto.getEmail()) != null)
+        if (this.clienteRepository.findByEmail(clienteDto.getEmail()) != null)
             throw new ValidacaoException("EMAIL já existente");
 
     }

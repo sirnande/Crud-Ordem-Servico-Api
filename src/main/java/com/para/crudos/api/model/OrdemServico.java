@@ -48,7 +48,7 @@ public class OrdemServico implements Serializable{
 	}
 	
 	
-	@Column(name = "data_finalizada", nullable = true)
+	@Column(name = "data_finalizada")
 	public Date getDataFinalizada() {
 		return dataFinalizada;
 	}
