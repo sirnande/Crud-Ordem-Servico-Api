@@ -53,7 +53,6 @@ public class Tecnico implements Serializable{
 		return "Tecnico{" +
 				"id=" + id +
 				", nome='" + nome + '\'' +
-				", os=" + os +
 				'}';
 	}
 }

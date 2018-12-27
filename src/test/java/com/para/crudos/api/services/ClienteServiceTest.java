@@ -1,5 +1,6 @@
 package com.para.crudos.api.services;
 
+import com.para.crudos.api.dtos.ClienteDTO;
 import com.para.crudos.api.model.Cliente;
 import com.para.crudos.api.repositories.ClienteRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,43 +45,43 @@ public class ClienteServiceTest {
     @Test
     @DisplayName("Persistindo um cliente na base de dado")
     public void testPersistirCliente(){
-        Cliente cliente = this.clienteService.persistir(new Cliente());
-        assertNotNull(cliente);
+        ClienteDTO clienteDTO = this.clienteService.gravar(new ClienteDTO());
+        assertNotNull(clienteDTO);
     }
 
     @Test
     @DisplayName("Tem que retorna um clinete dado um id")
     public void testBuscarClientePorId(){
-        Optional<Cliente> cliente = this.clienteService.buscarPorId(1L);
-        assertTrue(cliente.isPresent());
+        Cliente cliente = this.clienteService.buscarPorId(1L);
+        assertNotNull(cliente);
     }
 
     @Test
     @DisplayName("Tem que buscar e retorna um clinete dado um cpf")
     public void testbuscarClientePorCpf(){
-        Optional<Cliente> cliente = this.clienteService.buscarPorCpf("123456789");
-        assertTrue(cliente.isPresent());
+        ClienteDTO clienteDTO = this.clienteService.buscarPorCpf("123456789");
+        assertTrue(clienteDTO!=null);
     }
 
     @Test
     @DisplayName("Tem que buscar e retorna um cliente dado um email")
     public void buscarClientePorEmail() {
-        Optional<Cliente> cliente = this.clienteService.buscarPorEmail("teste@teste.com");
-        assertTrue(cliente.isPresent());
+        Cliente cliente = this.clienteService.buscarPorEmail("teste@teste.com");
+        assertTrue(cliente != null);
     }
 
     @Test
     @DisplayName("Tem que buscar e rtorna um cliente dado u telefone")
     public void buscarClientePorTelefone(){
-        Optional<Cliente> cliente = this.clienteService.buscarPorTelefone("(99) 9999-9999");
-        assertTrue(cliente.isPresent());
+        Cliente cliente = this.clienteService.buscarPorTelefone("(99) 9999-9999");
+        assertTrue(cliente  != null);
     }
 
     @Test
     @DisplayName("Te que buscar e retorna um clinete dado um nome")
     public void buscarClientePorNome(){
-        Optional<Cliente> cliente = this.clienteService.buscarPorNome("teste");
-        assertTrue(cliente.isPresent());
+        Cliente cliente = this.clienteService.buscarPorNome("teste");
+        assertTrue(cliente  != null);
     }
 
 }

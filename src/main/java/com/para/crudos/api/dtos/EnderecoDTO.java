@@ -3,8 +3,9 @@ package com.para.crudos.api.dtos;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
-public class EnderecoDto {
+public class EnderecoDTO implements Serializable {
 
     private Long id;
     private String cep;
@@ -77,7 +78,7 @@ public class EnderecoDto {
 
     @Override
     public String toString() {
-        return "EnderecoDto{" +
+        return "EnderecoDTO{" +
                 "id=" + id +
                 ", cep='" + cep + '\'' +
                 ", rua='" + rua + '\'' +

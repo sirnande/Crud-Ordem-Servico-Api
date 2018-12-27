@@ -1,9 +1,9 @@
 package com.para.crudos.api.enums;
 
 public enum Status {
-    CONCLUIDO,
+	CONCLUIDO,
     PENDENTE,
-    EM_ANALISE,
+    ANALISE,
     CANCELADA,
-    EM_ANDAMENTO
+    ANDAMENTO
 }

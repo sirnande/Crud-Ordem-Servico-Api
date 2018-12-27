@@ -9,7 +9,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class CrudOrdemServicoApplicationTests {
+public class CrudOrdemServicoServiceApplicationTests {
 
 	@Test
 	public void contextLoads() {

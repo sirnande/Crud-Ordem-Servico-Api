@@ -1,14 +1,14 @@
 package com.para.crudos.api.dtos;
 
 
-public class AuditoriaDto {
+public class AuditoriaDTO {
 
 
     private String id;
     private String objetoAntigo;
     private String objetoNovo;
     private String entidade;
-    private String data_modificacao;
+    private String dataModificacao;
 
     public String getId() {
         return id;
@@ -54,21 +54,21 @@ public class AuditoriaDto {
 
 
     public String getData_modificacao() {
-        return data_modificacao;
+        return dataModificacao;
     }
 
-    public void setData_modificacao(String data_modificacao) {
-        this.data_modificacao = data_modificacao;
+    public void setData_modificacao(String dataModificacao) {
+        this.dataModificacao = dataModificacao;
     }
 
     @Override
     public String toString() {
-        return "AuditoriaDto{" +
+        return "AuditoriaDTO{" +
                 "id='" + id + '\'' +
                 ", objetoAntigo='" + objetoAntigo + '\'' +
                 ", objetoNovo='" + objetoNovo + '\'' +
                 ", entidade='" + entidade + '\'' +
-                ", data_modificacao='" + data_modificacao + '\'' +
+                ", data_modificacao='" + dataModificacao + '\'' +
                 '}';
     }
 }

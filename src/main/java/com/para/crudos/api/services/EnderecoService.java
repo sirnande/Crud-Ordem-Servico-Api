@@ -1,65 +1,119 @@
 package com.para.crudos.api.services;
 
+import com.para.crudos.api.auditoria.Auditoria;
+import com.para.crudos.api.dtos.EnderecoDTO;
+import com.para.crudos.api.exceptions.ValidacaoException;
+import com.para.crudos.api.model.Cliente;
 import com.para.crudos.api.model.Endereco;
+import com.para.crudos.api.repositories.EnderecoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
-public interface EnderecoService {
+@Service
+public class EnderecoService {
 
+    private static final Logger log = LoggerFactory.getLogger(EnderecoService.class);
 
-    /**
-     * Pessitir um endereco na base de dados
-     *
-     * @param endereco
-     * @return Endereco
-     */
-    Endereco persistir(Endereco endereco);
+    @Autowired
+    private EnderecoRepository enderecoRepository;
 
+    @Autowired
+    private ConversionService conversionService;
 
-    /**
-     * Buscar e retorna um endereço dado um cep
-     *
-     * @param cep
-     * @return Endereco
-     */
-    Optional<Endereco> buscarPorCep(String cep);
+    private Auditoria<EnderecoDTO> auditoria = new Auditoria<>();
 
+    public EnderecoDTO salvar(EnderecoDTO enderecoDto){
+        log.info("Salvar um nome endereco: {} ", enderecoDto.toString());
+        validarDadosExistentes(enderecoDto);
+        Endereco endereco = Optional.ofNullable(this.enderecoRepository.save(this.conversionService.convert(enderecoDto, Endereco.class)))
+                .orElseThrow(() -> new ValidacaoException("Erro ao salvar o endereco " + enderecoDto.toString()));
+        EnderecoDTO enderecoDTO = this.conversionService.convert(endereco, EnderecoDTO.class);
+        auditoria.post(new EnderecoDTO(), enderecoDTO, "Endereco");
+        return enderecoDTO;
+    }
 
-    /**
-     * Buscar e retorna uma lista de endereco dado uma rua
-     *
-     * @param rua
-     * @return List<Endereco>
-     */
-     Optional<List<Endereco>> buscarPorRua(String rua);
+    public EnderecoDTO atualizar(EnderecoDTO enderecoDto){
+        log.info("Atualizar o endereco: {}"+ enderecoDto.toString());
 
-
-    /**
-     * Buscar e retorna uma lista de endereco dado uam cidade
-     *
-     * @param cidade
-     * @return List<Endereco>
-     */
-    Optional<List<Endereco>> buscarPorCidade(String cidade);
+        Endereco endereco = this.buscarPorId(enderecoDto.getId());
 
 
-    /**
-     * Buscar endereco por id
-     *
-     * @param id
-     * @return Endereco
-     */
-    Optional<Endereco> buscarPorId(Long id);
+        enderecoDto = this.conversionService.convert(
+                this.enderecoRepository.save(this.conversionService.convert(enderecoDto, Endereco.class)),
+
+                EnderecoDTO.class
+        );
+
+        auditoria.post(this.conversionService.convert(endereco, EnderecoDTO.class), enderecoDto, "Endereco");
+
+        return enderecoDto;
+    }
+
+    public EnderecoDTO buscarPorCep(String cep) {
+        log.info("Buscar endereco por cep: {}", cep);
+        Endereco endereco = Optional.ofNullable(this.enderecoRepository.findByCep(cep))
+                .orElseThrow(() -> new ValidacaoException("Endereco não encontrado para o CEP: "+ cep));
+        return this.conversionService.convert(endereco, EnderecoDTO.class);
+    }
 
 
-    /**
-     * Deletando um endereco por id
-     *
-     * @param id
-     */
-    void remover(Long id);
+    public List<EnderecoDTO> buscarPorRua(String rua) {
+        log.info("Buscar endereco por rua: {}", rua);
+        List<Endereco> enderecos = this.enderecoRepository.findByRua(rua);
+        if (enderecos.isEmpty()){
+            throw new ValidacaoException("Endereço não encontrado para a rua: "+ rua);
+        }
+        return enderecos.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
 
 
+    public List<EnderecoDTO> buscarPorCidade(String cidade) {
+        log.info("Buscar endereco por cidade: {}", cidade);
+        List<Endereco> enderecos = this.enderecoRepository.findByCidade(cidade);
+        if (enderecos.isEmpty()){
+            throw new ValidacaoException("Endereço não encontrado para a cidade: "+ cidade);
+        }
+        return enderecos.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+
+    public Endereco buscarPorId(Long id) {
+        return this.enderecoRepository.findById(id)
+                .orElseThrow(() -> new ValidacaoException("Endereço não encontrado para o id: "+ id));
+    }
+
+    public String remover(Long id) {
+        log.info("Removendo um endereco por id: {}", id);
+
+        Endereco endereco = buscarPorId(id);
+        this.enderecoRepository.deleteById(id);
+        auditoria.post(this.conversionService.convert(endereco, EnderecoDTO.class), new EnderecoDTO(), "Endereco");
+        return "Endereco deletado com sucesso......";
+    }
+
+
+    public void validarDadosExistentes(EnderecoDTO enderecoDto) {
+
+        if(this.enderecoRepository.findByCep(enderecoDto.getCep()) != null) {
+            throw new ValidacaoException("endereco CEP já existente.");
+        }
+    }
+
+    private EnderecoDTO toDto(Endereco endereco) {
+        return conversionService.convert(endereco, EnderecoDTO.class);
+    }
 }

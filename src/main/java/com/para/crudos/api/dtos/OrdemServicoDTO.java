@@ -1,8 +1,9 @@
 package com.para.crudos.api.dtos;
 
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
-public class OrdemServicoDto{
+public class OrdemServicoDTO implements Serializable {
 
     private Long id;
 
@@ -39,6 +40,7 @@ public class OrdemServicoDto{
         this.especificacao = especificacao;
     }
 
+    @NotEmpty(message = "Data de abertura não deve ser vazio")
     public String getDataAberta() {
         return dataAberta;
     }
@@ -56,6 +58,7 @@ public class OrdemServicoDto{
     }
 
 
+    @NotEmpty(message = "O Status da ordem de servico não deve ser vazio")
     public String getStatus() {
         return status;
     }
@@ -63,6 +66,7 @@ public class OrdemServicoDto{
     public void setStatus(String status) {
         this.status = status;
     }
+
 
     public Long getCliente() {
         return clienteId;
@@ -72,6 +76,7 @@ public class OrdemServicoDto{
         this.clienteId = cliente;
     }
 
+
     public Long getTecnico() {
         return tecnicoId;
     }
@@ -79,6 +84,7 @@ public class OrdemServicoDto{
     public void setTecnico(Long tecnico) {
         this.tecnicoId = tecnico;
     }
+
 
     public Long getEndereco() {
         return enderecoId;
@@ -90,7 +96,7 @@ public class OrdemServicoDto{
 
     @Override
     public String toString() {
-        return "OrdemServicoDto{" +
+        return "OrdemServicoDTO{" +
                 "id=" + id +
                 ", especificacao='" + especificacao + '\'' +
                 ", dataAberta='" + dataAberta + '\'' +
