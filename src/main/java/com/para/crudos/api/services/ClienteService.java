@@ -35,12 +35,11 @@ public class ClienteService implements Serializable {
 
         validarDadosExistentes(clienteDto);
 
-        //auditoria.post(new ClienteDTO(), clienteDto, "Cliente");
-
         Cliente cliente = Optional.ofNullable(this.clienteRepository.save(this.conversionService.convert(clienteDto, Cliente.class)))
                 .orElseThrow(() -> new ValidacaoException("Erro ao criar um novo cliente"+ clienteDto.toString()));
-
-        return this.conversionService.convert(cliente, ClienteDTO.class);
+        ClienteDTO clienteDTO = this.conversionService.convert(cliente, ClienteDTO.class);
+        auditoria.post(new ClienteDTO(), clienteDTO, "Cliente");
+        return clienteDTO;
     }
 
     public ClienteDTO atualizar(ClienteDTO clienteDto){
@@ -48,12 +47,9 @@ public class ClienteService implements Serializable {
         Cliente clienteAnt = buscarPorId(clienteDto.getId());
         Cliente cliente = Optional.ofNullable(this.clienteRepository.save(this.conversionService.convert(clienteDto, Cliente.class)))
                 .orElseThrow(() -> new ValidacaoException("Erro ao atualizar cliente  "+ clienteDto.toString()));
-
-        return this.conversionService.convert(
-                   cliente,
-
-                    ClienteDTO.class
-                );
+        ClienteDTO clienteDTO = this.conversionService.convert(cliente, ClienteDTO.class);
+        auditoria.post(this.conversionService.convert(clienteAnt, ClienteDTO.class), clienteDTO, "Cliente");
+        return clienteDTO;
     }
 
 
@@ -97,9 +93,8 @@ public class ClienteService implements Serializable {
         log.info("Removendo um cliente da base de dados com  id: []", id);
 
         Cliente cliente = buscarPorId(id);
-       // auditoria.post(this.conversionService.convert(cliente, ClienteDTO.class), new ClienteDTO(), "Cliente");
         this.clienteRepository.deleteById(id);
-
+        auditoria.post(this.conversionService.convert(cliente, ClienteDTO.class), new ClienteDTO(), "Cliente");
         return "Cliente excluido com sucesso....";
     }
 

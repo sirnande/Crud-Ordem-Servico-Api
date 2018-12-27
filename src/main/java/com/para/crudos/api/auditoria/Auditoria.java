@@ -5,7 +5,18 @@ import com.para.crudos.api.dtos.AuditoriaDTO;
 import com.para.crudos.api.exceptions.ValidacaoException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
 public class Auditoria<T> {
+    public Auditoria() {
+        try{
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress("localhost", 8090), 1000);
+        }catch (Exception ex){
+            throw new ValidacaoException("Erro ao se conectar com o servidor de auditoria");
+        }
+    }
 
     public void post(T objetoAntigo, T objetoNovo, String entidade){
         try{

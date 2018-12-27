@@ -1,5 +1,6 @@
 package com.para.crudos.api.services;
 
+import com.para.crudos.api.auditoria.Auditoria;
 import com.para.crudos.api.dtos.TecnicoDTO;
 import com.para.crudos.api.exceptions.ValidacaoException;
 import com.para.crudos.api.model.Tecnico;
@@ -23,6 +24,8 @@ public class TecnicoService{
     @Autowired
     private ConversionService conversionService;
 
+    private Auditoria<TecnicoDTO> auditoria = new Auditoria<>();
+
     public TecnicoDTO salvar(TecnicoDTO tecnicoDto){
         log.info("Salvar um novo tecnico: {}", tecnicoDto.toString());
         validarDadosExistentes(tecnicoDto);
@@ -32,20 +35,23 @@ public class TecnicoService{
 
                 TecnicoDTO.class
         );
-
+        auditoria.post(new TecnicoDTO(), tecnicoDto, "Tecnico");
         return tecnicoDto;
     }
 
     public TecnicoDTO atualizar(TecnicoDTO tecnicoDto){
         log.info("Atualizando tecnico: {}", tecnicoDto.toString());
-        buscarPorId(tecnicoDto.getId());
-        return this.conversionService.convert(
+        TecnicoDTO tecnicoDTOAnt = buscarPorId(tecnicoDto.getId());
+        TecnicoDTO tecnicoDTONovo = this.conversionService.convert(
                 this.tecnicoRepository.save(
                         this.conversionService.convert(tecnicoDto, Tecnico.class)
                 ),
 
                 TecnicoDTO.class
         );
+        auditoria.post(tecnicoDTOAnt, tecnicoDTONovo, "Tecnico");
+
+        return tecnicoDTONovo;
     }
 
 
@@ -73,8 +79,9 @@ public class TecnicoService{
 
     public String remover(Long id) {
         log.info("Deletando um novo tecnico por id: {}", id);
-        buscarPorId(id);
+        TecnicoDTO tecnicoDTO = buscarPorId(id);
         this.tecnicoRepository.deleteById(id);
+        auditoria.post(tecnicoDTO, new TecnicoDTO(), "Tecnico");
         return "Tecnico excluido com sucesso...";
     }
 

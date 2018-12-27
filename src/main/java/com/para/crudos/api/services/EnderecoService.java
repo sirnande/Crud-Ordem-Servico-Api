@@ -36,8 +36,9 @@ public class EnderecoService {
         validarDadosExistentes(enderecoDto);
         Endereco endereco = Optional.ofNullable(this.enderecoRepository.save(this.conversionService.convert(enderecoDto, Endereco.class)))
                 .orElseThrow(() -> new ValidacaoException("Erro ao salvar o endereco " + enderecoDto.toString()));
-
-        return this.conversionService.convert(endereco, EnderecoDTO.class);
+        EnderecoDTO enderecoDTO = this.conversionService.convert(endereco, EnderecoDTO.class);
+        auditoria.post(new EnderecoDTO(), enderecoDTO, "Endereco");
+        return enderecoDTO;
     }
 
     public EnderecoDTO atualizar(EnderecoDTO enderecoDto){
@@ -45,12 +46,14 @@ public class EnderecoService {
 
         Endereco endereco = this.buscarPorId(enderecoDto.getId());
 
-        //auditoria.post(this.conversionService.convert(endereco, EnderecoDTO.class), enderecoDto, "Endereco");
+
         enderecoDto = this.conversionService.convert(
                 this.enderecoRepository.save(this.conversionService.convert(enderecoDto, Endereco.class)),
 
                 EnderecoDTO.class
         );
+
+        auditoria.post(this.conversionService.convert(endereco, EnderecoDTO.class), enderecoDto, "Endereco");
 
         return enderecoDto;
     }
@@ -97,8 +100,8 @@ public class EnderecoService {
         log.info("Removendo um endereco por id: {}", id);
 
         Endereco endereco = buscarPorId(id);
-  //      auditoria.post(this.conversionService.convert(endereco, EnderecoDTO.class), new EnderecoDTO(), "Endereco");
         this.enderecoRepository.deleteById(id);
+        auditoria.post(this.conversionService.convert(endereco, EnderecoDTO.class), new EnderecoDTO(), "Endereco");
         return "Endereco deletado com sucesso......";
     }
 
